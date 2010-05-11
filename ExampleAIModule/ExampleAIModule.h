@@ -2,6 +2,7 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
+#include <vector>
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -28,4 +29,6 @@ public:
   void showPlayers();
   void showForces();
   bool show_visibility_data;
+  std::vector<BWAPI::Unit*> ownUnits;
+  std::map<int, BWAPI::Unit*> sightedEnemies;
 };

@@ -19,7 +19,7 @@ void ExampleAIModule::onStart()
   if (Broodwar->isReplay())
   {
     Broodwar->printf("The following players are in this replay:");
-    for(std::set<Player*>::iterator p=Broodwar->getPlayers().begin();p!=Broodwar->getPlayers().end();p++)
+    for(std::set<Player*>::iterator p = Broodwar->getPlayers().begin(); p != Broodwar->getPlayers().end(); p++)
     {
       if (!(*p)->getUnits().empty() && !(*p)->isNeutral())
       {
@@ -36,6 +36,7 @@ void ExampleAIModule::onStart()
     //send each worker to the mineral field that is closest to it
     for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
     {
+    //Broodwar->printf("Unit type: %s", (*i)->getType().getName().c_str());
       if ((*i)->getType().isWorker())
       {
         Unit* closestMineral=NULL;
@@ -64,8 +65,10 @@ void ExampleAIModule::onStart()
           }
         }
       }
-      else if (!(*i)->getType().isBuilding() && !(*i)->getType().isWorker()) {
-        
+      else if ((*i)->getType() == UnitTypes::Protoss_Dragoon) {
+         // Broodwar->printf("Unit type: %s", (*i)->getType().getName());
+		 ownUnits.push_back(*i);
+         (*i)->holdPosition();
       }
     }
   }
@@ -97,9 +100,21 @@ void ExampleAIModule::onFrame()
       }
     }
   }
-
-  if (Broodwar->isReplay())
+    
+  if (Broodwar->isReplay()) {
     return;
+  }
+  else {
+      for(std::map<int, Unit*>::iterator it = sightedEnemies.begin(); it != sightedEnemies.end(); it++) {
+          //Broodwar->printf("Unit: %s", (*it).second->getType().getName().c_str());
+      }
+      /*for(std::vector<Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+          if (!sightedEnemies.empty()) {
+              Broodwar->printf("Unit: %s", sightedEnemies.begin()->second->getType().getName().c_str());
+            (*it)->attackUnit(sightedEnemies.begin()->second);
+          }
+      }*/
+  }
 
   drawStats();
   if (analyzed && Broodwar->getFrameCount()%30==0)
@@ -212,8 +227,18 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit* unit)
 }
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit* unit)
 {
-  if (!Broodwar->isReplay())
-    Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
+    if (!Broodwar->isReplay()) {
+        Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
+        if (unit->getPlayer()->isEnemy(Broodwar->self())) {
+            sightedEnemies.erase(unit->getID());
+            for(std::vector<Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+                if (!sightedEnemies.empty()) {
+                    (*it)->attackUnit(sightedEnemies.begin()->second);
+                }
+            }
+        }
+    }
+    
 }
 
 void ExampleAIModule::onUnitMorph(BWAPI::Unit* unit)
@@ -242,14 +267,13 @@ void ExampleAIModule::onUnitShow(BWAPI::Unit* unit)
 	unit->getPosition().x(),
 	unit->getPosition().y());
   if (unit->getPlayer()->isEnemy(Broodwar->self())) {
-	  std::set<Unit*> units = Broodwar->self()->getUnits();
-	  for(std::set<Unit*>::const_iterator i = units.begin(); i != units.end(); i++) {
-		  Unit* selectedUnit = *i;
-		  Broodwar->printf("%s", selectedUnit->getOrder().getName());
-		  if (selectedUnit->getOrder().getName() != "AttackUnit") {
-			selectedUnit->rightClick(unit);
-		  }
-	  }
+      //Broodwar->printf("UnitType: %s", unit->getType().getName().c_str());
+      sightedEnemies.insert(std::pair<int, Unit*>(unit->getID(), unit));
+      if (sightedEnemies.size() == 1) {
+        for(std::vector<Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+            (*it)->attackUnit(unit);
+        } 
+      }
   }
 
 }
@@ -257,6 +281,10 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit* unit)
 {
 //  if (!Broodwar->isReplay())
   //  Broodwar->sendText("A %s [%x] was last seen at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
+    if (unit->getPlayer()->isEnemy(Broodwar->self())) {
+      //Broodwar->printf("UnitType: %s", unit->getType().getName().c_str());
+      sightedEnemies.erase(unit->getID());
+  }
 }
 void ExampleAIModule::onUnitRenegade(BWAPI::Unit* unit)
 {
