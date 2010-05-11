@@ -16,6 +16,16 @@ void ExampleAIModule::printPlayers() {
     }
 }
 
+BWAPI::Unit* ExampleAIModule::getClosestMineral(Unit* unit) {
+    BWAPI::Unit* closestMineral;
+    for(std::set<Unit*>::iterator mineralIterator = Broodwar->getMinerals().begin(); mineralIterator != Broodwar->getMinerals().end(); mineralIterator++) {
+        if ( closestMineral == NULL || (*unit)->getDistance(*mineralIterator) < (*unit)->getDistance(closestMineral) ) {
+            closestMineral = *mineralIterator;
+        }
+    }
+    return closestMineral;
+}
+
 void ExampleAIModule::onStart() {
     Broodwar->setLocalSpeed(50);
     Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
@@ -31,44 +41,36 @@ void ExampleAIModule::onStart() {
     show_visibility_data=false;
     
     printPlayers();
-    if (!Broodwar->isReplay()) { 
+    if ( !Broodwar->isReplay() ) { 
         //send each worker to the mineral field that is closest to it
-        for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++) {
+        for(std::set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin(); i != Broodwar->self()->getUnits().end(); i++) {
             //Broodwar->printf("Unit type: %s", (*i)->getType().getName().c_str());
-            if ((*i)->getType().isWorker()) {
-                Unit* closestMineral=NULL;
-                for(std::set<Unit*>::iterator m=Broodwar->getMinerals().begin();m!=Broodwar->getMinerals().end();m++) {
-                    if (closestMineral==NULL || (*i)->getDistance(*m)<(*i)->getDistance(closestMineral))
-                        closestMineral=*m;
-                    }
-                    if (closestMineral!=NULL) {
-                        (*i)->rightClick(closestMineral);
-                    }
+            if ( (*i)->getType().isWorker( )) {
+                Unit* closestMineral = getClosestMineral(i);
+                if ( closestMineral != NULL ) {
+                    (*i)->rightClick(closestMineral);
                 }
-            else if ((*i)->getType().isResourceDepot()) {
+            } else if ( (*i)->getType().isResourceDepot() ) {
                 //if this is a center, tell it to build the appropiate type of worker
-                if ((*i)->getType().getRace()!=Races::Zerg) {
+                if ( (*i)->getType().getRace() != Races::Zerg ) {
                     (*i)->train(*Broodwar->self()->getRace().getWorker());
                 }
                 else { //if we are Zerg, we need to select a larva and morph it into a drone
-                    std::set<Unit*> myLarva=(*i)->getLarva();
-                    if (myLarva.size()>0) {
-                        Unit* larva=*myLarva.begin();
+                    std::set<Unit*> myLarva = (*i)->getLarva();
+                    if ( myLarva.size() > 0 ) {
+                        Unit* larva =* myLarva.begin();
                         larva->morph(UnitTypes::Zerg_Drone);
                     }
                 }
-            }
-            else if ((*i)->getType() == UnitTypes::Protoss_Dragoon || (*i)->getType() == UnitTypes::Protoss_Zealot) {
-                // Broodwar->printf("Unit type: %s", (*i)->getType().getName());
+            } else if ( (!(*i)->getType().isBuilding()) && ((*i)->getType().canAttack()) ) {
 		        ownUnits.push_back(*i);
-                (*i)->holdPosition();
             }
         }
     }
 }
 
 void ExampleAIModule::onEnd(bool isWinner) {
-    if (isWinner) {
+    if ( isWinner ) {
         //log win to file
     }
 }
