@@ -81,6 +81,19 @@ void ExampleAIModule::onEnd(bool isWinner)
     //log win to file
   }
 }
+
+Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
+    std::pair<double, Unit*> minDist = std::pair<double, Unit*>(9999999.0, NULL);
+                
+    for(std::map<int, Unit*>::const_iterator it = sightedEnemies.begin(); it != sightedEnemies.end(); it++) {
+        if ((*it).second->getDistance(unit) < minDist.first) {
+            minDist = std::pair<double, Unit*>((*it).second->getDistance(unit), (*it).second);
+        }
+    }
+    //Broodwar->printf("Player: %s", minDist.second->getPlayer()->getName().c_str());
+    return minDist.second;
+}
+
 void ExampleAIModule::onFrame()
 {
   if (show_visibility_data)
@@ -106,26 +119,12 @@ void ExampleAIModule::onFrame()
     return;
   }
   else {
-      for(std::map<int, Unit*>::iterator it = sightedEnemies.begin(); it != sightedEnemies.end(); it++) {
-          //Broodwar->printf("Unit: %s", (*it).second->getType().getName().c_str());
-      }
-      if (Broodwar->getFrameCount() % 5 == 0) {
+      if (Broodwar->getFrameCount() % 30 == 0) {
           for(std::vector<Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
-                if (!sightedEnemies.empty()) {
-                    std::pair<double, Unit*> minDist = std::pair<double, Unit*>(9999999.0, NULL);
-                    
-                    for(std::map<int, Unit*>::const_iterator ait = sightedEnemies.begin(); ait != sightedEnemies.end(); ait++) {
-                        //Broodwar->printf("Dist1: %.2f, Dist2: %.2f ", ((*ait).second->getDistance((*it)), minDist.first));
-                        if ((*ait).second->getDistance((*it)) < minDist.first) {
-                            minDist = std::pair<double, Unit*>((*ait).second->getDistance((*it)), *it);
-                           // Broodwar->printf ("Dist: %f", minDist.first);
-                        }
-                        (*it)->attackUnit(minDist.second);
-                        //(*it)->attackUnit((*ait)
-                    }
-                    
-                }
-            }
+              if (!sightedEnemies.empty()) {
+                (*it)->attackUnit(getClosestUnit((*it)));
+              }
+          }
       }
       /*for(std::vector<Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
           if (!sightedEnemies.empty()) {
@@ -253,23 +252,11 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit* unit)
             
             for(std::vector<Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
                 if (!sightedEnemies.empty()) {
-                    std::pair<double, Unit*> minDist = std::pair<double, Unit*>(9999999.0, NULL);
-                    
-                    for(std::map<int, Unit*>::const_iterator ait = sightedEnemies.begin(); ait != sightedEnemies.end(); ait++) {
-                        //Broodwar->printf("Dist1: %.2f, Dist2: %.2f ", ((*ait).second->getDistance((*it)), minDist.first));
-                        if ((*ait).second->getDistance((*it)) < minDist.first) {
-                            minDist = std::pair<double, Unit*>((*ait).second->getDistance((*it)), *it);
-                           // Broodwar->printf ("Dist: %f", minDist.first);
-                        }
-                        (*it)->attackUnit(minDist.second);
-                        //(*it)->attackUnit((*ait)
-                    }
-                    
-                }
-            }
+                (*it)->attackUnit(getClosestUnit((*it)));
+              }
+             }             
         }
     }
-    
 }
 
 void ExampleAIModule::onUnitMorph(BWAPI::Unit* unit)
@@ -291,13 +278,7 @@ void ExampleAIModule::onUnitMorph(BWAPI::Unit* unit)
 }
 void ExampleAIModule::onUnitShow(BWAPI::Unit* unit)
 {
-  if (!Broodwar->isReplay())
-    Broodwar->sendText("A %s [%x] has been spotted at (%d,%d)", 
-	unit->getType().getName().c_str(),
-	unit, 
-	unit->getPosition().x(),
-	unit->getPosition().y());
-  if (unit->getPlayer()->isEnemy(Broodwar->self())) {
+  if (!Broodwar->isReplay() && unit->getPlayer()->isEnemy(Broodwar->self())) {
       //Broodwar->printf("UnitType: %s", unit->getType().getName().c_str());
       sightedEnemies.insert(std::pair<int, Unit*>(unit->getID(), unit));
       if (sightedEnemies.size() == 1) {
