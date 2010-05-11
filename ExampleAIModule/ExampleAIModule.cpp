@@ -16,10 +16,10 @@ void ExampleAIModule::printPlayers() {
     }
 }
 
-BWAPI::Unit* ExampleAIModule::getClosestMineral(Unit* unit) {
-    BWAPI::Unit* closestMineral;
+BWAPI::Unit* ExampleAIModule::getClosestMineral(BWAPI::Unit* unit) {
+    Unit* closestMineral = NULL;
     for(std::set<Unit*>::iterator mineralIterator = Broodwar->getMinerals().begin(); mineralIterator != Broodwar->getMinerals().end(); mineralIterator++) {
-        if ( closestMineral == NULL || (*unit)->getDistance(*mineralIterator) < (*unit)->getDistance(closestMineral) ) {
+        if ( closestMineral == NULL || unit->getDistance(*mineralIterator) < unit->getDistance(closestMineral) ) {
             closestMineral = *mineralIterator;
         }
     }
@@ -41,12 +41,11 @@ void ExampleAIModule::onStart() {
     show_visibility_data=false;
     
     printPlayers();
-    if ( !Broodwar->isReplay() ) { 
-        //send each worker to the mineral field that is closest to it
+    if ( !Broodwar->isReplay() ) {
         for(std::set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin(); i != Broodwar->self()->getUnits().end(); i++) {
-            //Broodwar->printf("Unit type: %s", (*i)->getType().getName().c_str());
+            //send each worker to the mineral field that is closest to it
             if ( (*i)->getType().isWorker( )) {
-                Unit* closestMineral = getClosestMineral(i);
+                Unit* closestMineral = getClosestMineral(*i);
                 if ( closestMineral != NULL ) {
                     (*i)->rightClick(closestMineral);
                 }
@@ -125,16 +124,16 @@ void ExampleAIModule::onFrame() {
         for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++) {
             if ((*i)->getType().isWorker()) {
                 //get the chokepoints linked to our home region
-                std::set<BWTA::Chokepoint*> chokepoints= home->getChokepoints();
-                double min_length=10000;
-                BWTA::Chokepoint* choke=NULL;
+                std::set<BWTA::Chokepoint*> chokepoints = home->getChokepoints();
+                double min_length = 10000;
+                BWTA::Chokepoint* choke = NULL;
 
                 //iterate through all chokepoints and look for the one with the smallest gap (least width)
-                for(std::set<BWTA::Chokepoint*>::iterator c=chokepoints.begin();c!=chokepoints.end();c++) {
-                    double length=(*c)->getWidth();
-                    if (length<min_length || choke==NULL) {
-                        min_length=length;
-                        choke=*c;
+                for(std::set<BWTA::Chokepoint*>::iterator c = chokepoints.begin(); c != chokepoints.end(); c++) {
+                    double length = (*c)->getWidth();
+                    if ( length < min_length || choke == NULL ) {
+                        min_length = length;
+                        choke = *c;
                     }
                 }
 
@@ -144,6 +143,7 @@ void ExampleAIModule::onFrame() {
             }
         }
     }
+
     if (analyzed) {
         //we will iterate through all the base locations, and draw their outlines.
         for(std::set<BWTA::BaseLocation*>::const_iterator i=BWTA::getBaseLocations().begin();i!=BWTA::getBaseLocations().end();i++) {
@@ -259,7 +259,6 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit* unit) {
     //  if (!Broodwar->isReplay())
     //  Broodwar->sendText("A %s [%x] was last seen at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
     if (unit->getPlayer()->isEnemy(Broodwar->self())) {
-        //Broodwar->printf("UnitType: %s", unit->getType().getName().c_str());
         sightedEnemies.erase(unit->getID());
     }
 }

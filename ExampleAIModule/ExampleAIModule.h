@@ -33,5 +33,5 @@ public:
     std::map<int, BWAPI::Unit*> sightedEnemies;
     virtual void printPlayers();
     virtual BWAPI::Unit* getClosestUnit(BWAPI::Unit* unit);
-    virtual BWAPI::Unit* getClosestMineral(Unit* unit);
+    virtual BWAPI::Unit* getClosestMineral(BWAPI::Unit* unit);
 };
