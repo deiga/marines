@@ -68,9 +68,18 @@ void ExampleAIModule::onStart() {
         }
         //Position temp = getCenter(ownUnits);
         //Broodwar->printf("startX: %d, startY: %d", temp.x(), temp.y());
-        for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+       /* for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
             (*it).second->rightClick(Position(800, 1173));
-        }
+        }*/
+        MoveToLine();
+    }
+}
+
+void ExampleAIModule::MoveToLine() {
+    int y = 800;
+    for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+        y += 50;
+        (*it).second->rightClick(Position(600, y));
     }
 }
 
@@ -82,10 +91,9 @@ void ExampleAIModule::onEnd(bool isWinner) {
 
 void ExampleAIModule::unitEvade(BWAPI::Unit* unit) {
     Position path = getEvadePath(unit);
-    Broodwar->printf("Path: x: %d, y: %d", path.x(), path.y());
-    Broodwar->printf("Unit: x: %d, y: %d", unit->getPosition().x(), unit->getPosition().y());
-    //unit->holdPosition();
-    Broodwar->printf("RightClick: %s", (unit->rightClick(path) ? "true" : "false"));
+    /*Broodwar->printf("Path: x: %d, y: %d", path.x(), path.y());
+    Broodwar->printf("Unit: x: %d, y: %d", unit->getPosition().x(), unit->getPosition().y());*/
+    unit->rightClick(path);
     Broodwar->drawLine(CoordinateType::Map,unit->getPosition().x(),unit->getPosition().y(),path.x(),path.y(),Colors::Green);
 }
 
@@ -154,7 +162,6 @@ void ExampleAIModule::onFrame() {
         if (!sightedEnemies.empty()) {
             for (std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
                 if ( healthThreshold((*it).second) ) {
-                    //Broodwar->printf("Hep!");
                     unitEvade((*it).second);
                 }
             }

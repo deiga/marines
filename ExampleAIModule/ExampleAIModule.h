@@ -41,4 +41,5 @@ public:
     virtual BWAPI::Position getEvadePath(BWAPI::Unit*);
     virtual bool healthThreshold(BWAPI::Unit*);
     virtual BWAPI::Position calcEvadePath(int, int, BWAPI::Unit*);
+    virtual void MoveToLine();
 };
