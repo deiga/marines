@@ -62,7 +62,7 @@ void ExampleAIModule::onStart() {
                     }
                 }
             } else if ( (!(*i)->getType().isBuilding()) && ((*i)->getType().canAttack()) ) {
-		        ownUnits.push_back(*i);
+                ownUnits.insert(std::pair<int, Unit*>((*i)->getID(), (*i)));
             }
         }
     }
@@ -110,11 +110,7 @@ void ExampleAIModule::onFrame() {
     }
     else {
         if (Broodwar->getFrameCount() % 30 == 0) {
-            for(std::vector<Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
-                if (!sightedEnemies.empty()) {
-                    (*it)->attackUnit(getClosestUnit((*it)));
-                }
-            }
+            allUnitsAttackClosest();
         }
     }
 
@@ -217,12 +213,17 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit* unit) {
         //Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
         if (unit->getPlayer()->isEnemy(Broodwar->self())) {
             sightedEnemies.erase(unit->getID());
-            
-            for(std::vector<Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
-                if (!sightedEnemies.empty()) {
-                (*it)->attackUnit(getClosestUnit((*it)));
-              }
-             }             
+            allUnitsAttackClosest();
+        } else if (unit->getPlayer() == Broodwar->self()) {
+            ownUnits.erase(unit->getID());
+        }
+    }
+}
+
+void ExampleAIModule::allUnitsAttackClosest() {
+    for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+        if (!sightedEnemies.empty()) {
+            (*it).second->attackUnit(getClosestUnit((*it).second));
         }
     }
 }
@@ -248,8 +249,8 @@ void ExampleAIModule::onUnitShow(BWAPI::Unit* unit) {
         //Broodwar->printf("UnitType: %s", unit->getType().getName().c_str());
         sightedEnemies.insert(std::pair<int, Unit*>(unit->getID(), unit));
         if (sightedEnemies.size() == 1) {
-            for(std::vector<Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
-                (*it)->attackUnit(unit);
+            for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+                (*it).second->attackUnit(unit);
             } 
         }
     }

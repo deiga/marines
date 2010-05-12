@@ -29,9 +29,10 @@ public:
     void showForces();
     bool show_visibility_data;
 
-    std::vector<BWAPI::Unit*> ownUnits;
+    std::map<int, BWAPI::Unit*> ownUnits;
     std::map<int, BWAPI::Unit*> sightedEnemies;
     virtual void printPlayers();
     virtual BWAPI::Unit* getClosestUnit(BWAPI::Unit* unit);
     virtual BWAPI::Unit* getClosestMineral(BWAPI::Unit* unit);
+    virtual void allUnitsAttackClosest();
 };
