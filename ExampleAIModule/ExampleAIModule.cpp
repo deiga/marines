@@ -130,7 +130,15 @@ Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
 }
 
 bool ExampleAIModule::healthThreshold(Unit* target) {
-    return target->getHitPoints() <= target->getType().maxHitPoints()*0.65;
+    if ( target->getShields() == 0 ) {
+        return true;
+    } else if ( target->getHitPoints() == target->getType().maxHitPoints()*0.75 ) {
+        return true;
+    } else if ( target->getHitPoints() == target->getType().maxHitPoints()*0.50 ) {
+        return true;
+    } else if ( target->getHitPoints() == target->getType().maxHitPoints()*0.35 ) {
+        return true;
+    } else return false;
 }
 
 void ExampleAIModule::onFrame() {
