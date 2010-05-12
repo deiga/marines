@@ -27,7 +27,7 @@ BWAPI::Unit* ExampleAIModule::getClosestMineral(BWAPI::Unit* unit) {
 }
 
 void ExampleAIModule::onStart() {
-    Broodwar->setLocalSpeed(50);
+    Broodwar->setLocalSpeed(60);
     Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
     // Enable some cheat flags
     Broodwar->enableFlag(Flag::UserInput);
@@ -84,8 +84,9 @@ void ExampleAIModule::unitEvade(BWAPI::Unit* unit) {
     Position path = getEvadePath(unit);
     Broodwar->printf("Path: x: %d, y: %d", path.x(), path.y());
     Broodwar->printf("Unit: x: %d, y: %d", unit->getPosition().x(), unit->getPosition().y());
-    unit->holdPosition();
-    unit->rightClick(Position(path));
+    //unit->holdPosition();
+    Broodwar->printf("RightClick: %s", (unit->rightClick(path) ? "true" : "false"));
+    Broodwar->drawLine(CoordinateType::Map,unit->getPosition().x(),unit->getPosition().y(),path.x(),path.y(),Colors::Green);
 }
 
 Position ExampleAIModule::calcEvadePath(int x_direction, int y_direction, BWAPI::Unit* unit) {
@@ -121,7 +122,7 @@ Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
 }
 
 bool ExampleAIModule::healthThreshold(Unit* target) {
-    return target->getHitPoints() <= target->getInitialHitPoints()*0.35;
+    return target->getHitPoints() <= target->getType().maxHitPoints()*0.65;
 }
 
 void ExampleAIModule::onFrame() {
@@ -153,7 +154,7 @@ void ExampleAIModule::onFrame() {
         if (!sightedEnemies.empty()) {
             for (std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
                 if ( healthThreshold((*it).second) ) {
-                    Broodwar->printf("Hep!");
+                    //Broodwar->printf("Hep!");
                     unitEvade((*it).second);
                 }
             }
