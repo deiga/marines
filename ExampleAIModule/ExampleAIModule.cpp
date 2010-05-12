@@ -42,6 +42,7 @@ void ExampleAIModule::onStart() {
     
     printPlayers();
     if ( !Broodwar->isReplay() ) {
+        sightedEnemies.clear();
         for(std::set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin(); i != Broodwar->self()->getUnits().end(); i++) {
             //send each worker to the mineral field that is closest to it
             if ( (*i)->getType().isWorker( )) {
@@ -65,6 +66,8 @@ void ExampleAIModule::onStart() {
                 ownUnits.insert(std::pair<int, Unit*>((*i)->getID(), (*i)));
             }
         }
+        Position temp = getCenter(ownUnits);
+        Broodwar->printf("startX: %d, startY: %d", temp.x(), temp.y());
     }
 }
 
@@ -74,8 +77,18 @@ void ExampleAIModule::onEnd(bool isWinner) {
     }
 }
 
-void unitEvade(BWAPI::Unit* unit) {
-    
+void ExampleAIModule::unitEvade(BWAPI::Unit* unit) {
+    Position path = getEvadePath(unit);
+
+}
+
+BWAPI::Position ExampleAIModule::getEvadePath(BWAPI::Unit* unit) {
+    Position enemyPos = getCenter(sightedEnemies);
+    Position unitPos = unit->getPosition();
+    int diffX = enemyPos.x() - unitPos.x();
+    int diffY = enemyPos.y() - unitPos.y();
+    //Broodwar->printf("x: %d, y: %d", diffX, diffY);
+    return Position(diffX, diffY);
 }
 
 Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
@@ -88,6 +101,10 @@ Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
     }
     //Broodwar->printf("Player: %s", minDist.second->getPlayer()->getName().c_str());
     return minDist.second;
+}
+
+bool ExampleAIModule::healthThreshold(Unit* target) {
+    return target->getHitPoints() <= target->getInitialHitPoints()/2;
 }
 
 void ExampleAIModule::onFrame() {
@@ -115,6 +132,13 @@ void ExampleAIModule::onFrame() {
     else {
         if (Broodwar->getFrameCount() % 30 == 0) {
             allUnitsAttackClosest();
+        }
+        if (!sightedEnemies.empty()) {
+            for (std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+                if ( healthThreshold((*it).second) ) {
+                    unitEvade((*it).second);
+                }
+            }
         }
     }
 
@@ -212,28 +236,29 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit* unit) {
     }
 }
 
-Position ExampleAIModule::getCenter(std::map<int, BWAPI::Unit*> unitGroup) {
+BWAPI::Position ExampleAIModule::getCenter(std::map<int, BWAPI::Unit*> unitGroup) {
     if (unitGroup.empty()) {
         return Positions::None;
     }
-    if (unitGroup.size()==1) {
+    if (unitGroup.size() == 1) {
         return (unitGroup.begin()->second->getPosition());
     }
-    int count=0;
-    double x=0;
-    double y=0;
-    for(std::map<int,Unit*>::const_iterator i=unitGroup.begin();i!=unitGroup.end();i++) {
+    int count, x, y;
+    count = x = y = 0;
+    for(std::map<int,Unit*>::const_iterator i = unitGroup.begin(); i != unitGroup.end(); i++) {
         Position p((*i).second->getPosition());
-        if (p!=Positions::None && p!=Positions::Unknown) {
+        if ( p != Positions::None && p != Positions::Unknown && p != Positions::Invalid ) {
             count++;
-            x+=p.x();
-            y+=p.y();
+            x += p.x();
+            y += p.y();
         }
     }
-    if (count==0) {
+    if (count == 0) {
         return Positions::None;
     }
-    return Position((int)(x/count),(int)(y/count));
+
+    Position temp = Position( x/count, y/count );
+    return temp;
 }
 
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit* unit) {
@@ -292,24 +317,25 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit* unit) {
     }
 }
 
-void ExampleAIModule::onUnitRenegade(BWAPI::Unit* unit) {
-    if (!Broodwar->isReplay()) {
-        Broodwar->sendText("A %s [%x] is now owned by %s",unit->getType().getName().c_str(),unit,unit->getPlayer()->getName().c_str());
-    }
-}
+
 
 void ExampleAIModule::onPlayerLeft(BWAPI::Player* player) {
     Broodwar->sendText("%s left the game.",player->getName().c_str());
 }
 
-void ExampleAIModule::onNukeDetect(BWAPI::Position target) {
-    if (target!=Positions::Unknown) {
-        Broodwar->printf("Nuclear Launch Detected at (%d,%d)",target.x(),target.y());
-    }
-    else {
-        Broodwar->printf("Nuclear Launch Detected");
-    }
-}
+//void ExampleAIModule::onNukeDetect(BWAPI::Position target) {
+//    if (target!=Positions::Unknown) {
+//        Broodwar->printf("Nuclear Launch Detected at (%d,%d)",target.x(),target.y());
+//    }
+//    else {
+//        Broodwar->printf("Nuclear Launch Detected");
+//    }
+//}
+//void ExampleAIModule::onUnitRenegade(BWAPI::Unit* unit) {
+//    if (!Broodwar->isReplay()) {
+//        Broodwar->sendText("A %s [%x] is now owned by %s",unit->getType().getName().c_str(),unit,unit->getPlayer()->getName().c_str());
+//    }
+//}
 
 bool ExampleAIModule::onSendText(std::string text) {
     if (text=="/show players") {

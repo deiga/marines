@@ -17,13 +17,13 @@ public:
     virtual void onFrame();
     virtual bool onSendText(std::string text);
     virtual void onPlayerLeft(BWAPI::Player* player);
-    virtual void onNukeDetect(BWAPI::Position target);
+    //virtual void onNukeDetect(BWAPI::Position target);
     virtual void onUnitCreate(BWAPI::Unit* unit);
     virtual void onUnitDestroy(BWAPI::Unit* unit);
     virtual void onUnitMorph(BWAPI::Unit* unit);
     virtual void onUnitShow(BWAPI::Unit* unit);
     virtual void onUnitHide(BWAPI::Unit* unit);
-    virtual void onUnitRenegade(BWAPI::Unit* unit);
+    //virtual void onUnitRenegade(BWAPI::Unit* unit);
     void drawStats(); //not part of BWAPI::AIModule
     void showPlayers();
     void showForces();
@@ -37,5 +37,6 @@ public:
     virtual void allUnitsAttackClosest();
     virtual BWAPI::Position getCenter(std::map<int, BWAPI::Unit*> unitGroup);
     virtual void unitEvade(BWAPI::Unit* unit);
-    virtual std::pair<double, double> getEvadePath();
+    virtual BWAPI::Position getEvadePath(BWAPI::Unit* unit);
+    virtual bool healthThreshold(BWAPI::Unit* target);
 };
