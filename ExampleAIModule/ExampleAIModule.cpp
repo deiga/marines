@@ -74,6 +74,10 @@ void ExampleAIModule::onEnd(bool isWinner) {
     }
 }
 
+void unitEvade(BWAPI::Unit* unit) {
+    
+}
+
 Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
     std::pair<double, Unit*> minDist = std::pair<double, Unit*>(9999999.0, NULL);
                 

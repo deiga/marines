@@ -36,4 +36,6 @@ public:
     virtual BWAPI::Unit* getClosestMineral(BWAPI::Unit* unit);
     virtual void allUnitsAttackClosest();
     virtual BWAPI::Position getCenter(std::map<int, BWAPI::Unit*> unitGroup);
+    virtual void unitEvade(BWAPI::Unit* unit);
+    virtual std::pair<double, double> getEvadePath();
 };
