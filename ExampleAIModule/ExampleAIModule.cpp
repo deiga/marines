@@ -66,8 +66,11 @@ void ExampleAIModule::onStart() {
                 ownUnits.insert(std::pair<int, Unit*>((*i)->getID(), (*i)));
             }
         }
-        Position temp = getCenter(ownUnits);
-        Broodwar->printf("startX: %d, startY: %d", temp.x(), temp.y());
+        //Position temp = getCenter(ownUnits);
+        //Broodwar->printf("startX: %d, startY: %d", temp.x(), temp.y());
+        for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+            (*it).second->rightClick(Position(800, 1173));
+        }
     }
 }
 
@@ -79,16 +82,30 @@ void ExampleAIModule::onEnd(bool isWinner) {
 
 void ExampleAIModule::unitEvade(BWAPI::Unit* unit) {
     Position path = getEvadePath(unit);
-
+    Broodwar->printf("Path: x: %d, y: %d", path.x(), path.y());
+    Broodwar->printf("Unit: x: %d, y: %d", unit->getPosition().x(), unit->getPosition().y());
+    unit->holdPosition();
+    unit->rightClick(Position(path));
 }
 
-BWAPI::Position ExampleAIModule::getEvadePath(BWAPI::Unit* unit) {
+Position ExampleAIModule::calcEvadePath(int x_direction, int y_direction, BWAPI::Unit* unit) {
+    int x_coord, y_coord;
+    if ( unit->getType() == UnitTypes::Protoss_Dragoon ) {
+        x_coord = x_direction * (-1) + unit->getPosition().x();
+        y_coord = y_direction * (-1) + unit->getPosition().y();
+    } else if ( unit->getType() == UnitTypes::Protoss_Zealot ) {
+
+    }
+    return Position(x_coord, y_coord);
+}
+
+Position ExampleAIModule::getEvadePath(BWAPI::Unit* unit) {
     Position enemyPos = getCenter(sightedEnemies);
     Position unitPos = unit->getPosition();
     int diffX = enemyPos.x() - unitPos.x();
     int diffY = enemyPos.y() - unitPos.y();
     //Broodwar->printf("x: %d, y: %d", diffX, diffY);
-    return Position(diffX, diffY);
+    return calcEvadePath(diffX, diffY, unit);
 }
 
 Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
@@ -104,7 +121,7 @@ Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
 }
 
 bool ExampleAIModule::healthThreshold(Unit* target) {
-    return target->getHitPoints() <= target->getInitialHitPoints()/2;
+    return target->getHitPoints() <= target->getInitialHitPoints()*0.35;
 }
 
 void ExampleAIModule::onFrame() {
@@ -131,11 +148,12 @@ void ExampleAIModule::onFrame() {
     }
     else {
         if (Broodwar->getFrameCount() % 30 == 0) {
-            allUnitsAttackClosest();
+            //allUnitsAttackClosest();
         }
         if (!sightedEnemies.empty()) {
             for (std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
                 if ( healthThreshold((*it).second) ) {
+                    Broodwar->printf("Hep!");
                     unitEvade((*it).second);
                 }
             }
@@ -266,7 +284,7 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit* unit) {
         //Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
         if (unit->getPlayer()->isEnemy(Broodwar->self())) {
             sightedEnemies.erase(unit->getID());
-            allUnitsAttackClosest();
+            //allUnitsAttackClosest();
         } else if (unit->getPlayer() == Broodwar->self()) {
             ownUnits.erase(unit->getID());
         }
