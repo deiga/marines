@@ -208,6 +208,30 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit* unit) {
     }
 }
 
+Position ExampleAIModule::getCenter(std::map<int, BWAPI::Unit*> unitGroup) {
+    if (unitGroup.empty()) {
+        return Positions::None;
+    }
+    if (unitGroup.size()==1) {
+        return (unitGroup.begin()->second->getPosition());
+    }
+    int count=0;
+    double x=0;
+    double y=0;
+    for(std::map<int,Unit*>::const_iterator i=unitGroup.begin();i!=unitGroup.end();i++) {
+        Position p((*i).second->getPosition());
+        if (p!=Positions::None && p!=Positions::Unknown) {
+            count++;
+            x+=p.x();
+            y+=p.y();
+        }
+    }
+    if (count==0) {
+        return Positions::None;
+    }
+    return Position((int)(x/count),(int)(y/count));
+}
+
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit* unit) {
     if (!Broodwar->isReplay()) {
         //Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
