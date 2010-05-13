@@ -1,7 +1,7 @@
-#include "ExampleAIModule.h"
+#include "MarinesAIModule.h"
 using namespace BWAPI;
 
-void ExampleAIModule::printPlayers() {
+void MarinesAIModule::printPlayers() {
     if (Broodwar->isReplay()) {
         Broodwar->printf("The following players are in this replay:");
             for(std::set<Player*>::iterator p = Broodwar->getPlayers().begin(); p != Broodwar->getPlayers().end(); p++) {
@@ -16,7 +16,7 @@ void ExampleAIModule::printPlayers() {
     }
 }
 
-BWAPI::Unit* ExampleAIModule::getClosestMineral(BWAPI::Unit* unit) {
+BWAPI::Unit* MarinesAIModule::getClosestMineral(BWAPI::Unit* unit) {
     Unit* closestMineral = NULL;
     for(std::set<Unit*>::iterator mineralIterator = Broodwar->getMinerals().begin(); mineralIterator != Broodwar->getMinerals().end(); mineralIterator++) {
         if ( closestMineral == NULL || unit->getDistance(*mineralIterator) < unit->getDistance(closestMineral) ) {
@@ -26,7 +26,7 @@ BWAPI::Unit* ExampleAIModule::getClosestMineral(BWAPI::Unit* unit) {
     return closestMineral;
 }
 
-void ExampleAIModule::onStart() {
+void MarinesAIModule::onStart() {
     Broodwar->setLocalSpeed(60);
     Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
     // Enable some cheat flags
@@ -75,7 +75,7 @@ void ExampleAIModule::onStart() {
     }
 }
 
-void ExampleAIModule::MoveToLine() {
+void MarinesAIModule::MoveToLine() {
     int y = 800;
     for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
         y += 50;
@@ -83,13 +83,13 @@ void ExampleAIModule::MoveToLine() {
     }
 }
 
-void ExampleAIModule::onEnd(bool isWinner) {
+void MarinesAIModule::onEnd(bool isWinner) {
     if ( isWinner ) {
         //log win to file
     }
 }
 
-void ExampleAIModule::unitEvade(BWAPI::Unit* unit) {
+void MarinesAIModule::unitEvade(BWAPI::Unit* unit) {
     Position path = getEvadePath(unit);
     /*Broodwar->printf("Path: x: %d, y: %d", path.x(), path.y());
     Broodwar->printf("Unit: x: %d, y: %d", unit->getPosition().x(), unit->getPosition().y());*/
@@ -97,7 +97,7 @@ void ExampleAIModule::unitEvade(BWAPI::Unit* unit) {
     Broodwar->drawLine(CoordinateType::Map,unit->getPosition().x(),unit->getPosition().y(),path.x(),path.y(),Colors::Green);
 }
 
-Position ExampleAIModule::calcEvadePath(int x_direction, int y_direction, BWAPI::Unit* unit) {
+Position MarinesAIModule::calcEvadePath(int x_direction, int y_direction, BWAPI::Unit* unit) {
     int x_coord, y_coord;
     if ( unit->getType() == UnitTypes::Protoss_Dragoon ) {
         x_coord = x_direction * (-1) + unit->getPosition().x();
@@ -108,7 +108,7 @@ Position ExampleAIModule::calcEvadePath(int x_direction, int y_direction, BWAPI:
     return Position(x_coord, y_coord);
 }
 
-Position ExampleAIModule::getEvadePath(BWAPI::Unit* unit) {
+Position MarinesAIModule::getEvadePath(BWAPI::Unit* unit) {
     Position enemyPos = getCenter(sightedEnemies);
     Position unitPos = unit->getPosition();
     int diffX = enemyPos.x() - unitPos.x();
@@ -117,7 +117,7 @@ Position ExampleAIModule::getEvadePath(BWAPI::Unit* unit) {
     return calcEvadePath(diffX, diffY, unit);
 }
 
-Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
+Unit* MarinesAIModule::getClosestUnit(BWAPI::Unit* unit) {
     std::pair<double, Unit*> minDist = std::pair<double, Unit*>(9999999.0, NULL);
                 
     for(std::map<int, Unit*>::const_iterator it = sightedEnemies.begin(); it != sightedEnemies.end(); it++) {
@@ -129,7 +129,7 @@ Unit* ExampleAIModule::getClosestUnit(BWAPI::Unit* unit) {
     return minDist.second;
 }
 
-bool ExampleAIModule::healthThreshold(Unit* target) {
+bool MarinesAIModule::healthThreshold(Unit* target) {
     if ( target->getShields() == 0 ) {
         return true;
     } else if ( target->getHitPoints() == target->getType().maxHitPoints()*0.75 ) {
@@ -141,7 +141,7 @@ bool ExampleAIModule::healthThreshold(Unit* target) {
     } else return false;
 }
 
-void ExampleAIModule::onFrame() {
+void MarinesAIModule::onFrame() {
     if (show_visibility_data) {    
         for(int x=0;x<Broodwar->mapWidth();x++) {
             for(int y=0;y<Broodwar->mapHeight();y++) {
@@ -254,7 +254,7 @@ void ExampleAIModule::onFrame() {
     }
 }
 
-void ExampleAIModule::onUnitCreate(BWAPI::Unit* unit) {
+void MarinesAIModule::onUnitCreate(BWAPI::Unit* unit) {
     if (!Broodwar->isReplay()) {
         Broodwar->sendText("A %s [%x] has been created at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
     }
@@ -270,7 +270,7 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit* unit) {
     }
 }
 
-BWAPI::Position ExampleAIModule::getCenter(std::map<int, BWAPI::Unit*> unitGroup) {
+BWAPI::Position MarinesAIModule::getCenter(std::map<int, BWAPI::Unit*> unitGroup) {
     if (unitGroup.empty()) {
         return Positions::None;
     }
@@ -295,7 +295,7 @@ BWAPI::Position ExampleAIModule::getCenter(std::map<int, BWAPI::Unit*> unitGroup
     return temp;
 }
 
-void ExampleAIModule::onUnitDestroy(BWAPI::Unit* unit) {
+void MarinesAIModule::onUnitDestroy(BWAPI::Unit* unit) {
     if (!Broodwar->isReplay()) {
         //Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
         if (unit->getPlayer()->isEnemy(Broodwar->self())) {
@@ -307,7 +307,7 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit* unit) {
     }
 }
 
-void ExampleAIModule::allUnitsAttackClosest() {
+void MarinesAIModule::allUnitsAttackClosest() {
     for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
         if (!sightedEnemies.empty()) {
             (*it).second->attackUnit(getClosestUnit((*it).second));
@@ -315,7 +315,7 @@ void ExampleAIModule::allUnitsAttackClosest() {
     }
 }
 
-void ExampleAIModule::onUnitMorph(BWAPI::Unit* unit) {
+void MarinesAIModule::onUnitMorph(BWAPI::Unit* unit) {
     if (!Broodwar->isReplay()) {
         Broodwar->sendText("A %s [%x] has been morphed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
     }
@@ -331,7 +331,7 @@ void ExampleAIModule::onUnitMorph(BWAPI::Unit* unit) {
      }
 }
 
-void ExampleAIModule::onUnitShow(BWAPI::Unit* unit) {
+void MarinesAIModule::onUnitShow(BWAPI::Unit* unit) {
     if (!Broodwar->isReplay() && unit->getPlayer()->isEnemy(Broodwar->self())) {
         //Broodwar->printf("UnitType: %s", unit->getType().getName().c_str());
         sightedEnemies.insert(std::pair<int, Unit*>(unit->getID(), unit));
@@ -343,7 +343,7 @@ void ExampleAIModule::onUnitShow(BWAPI::Unit* unit) {
     }
 }
 
-void ExampleAIModule::onUnitHide(BWAPI::Unit* unit) {
+void MarinesAIModule::onUnitHide(BWAPI::Unit* unit) {
     //  if (!Broodwar->isReplay())
     //  Broodwar->sendText("A %s [%x] was last seen at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
     if (unit->getPlayer()->isEnemy(Broodwar->self())) {
@@ -353,11 +353,11 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit* unit) {
 
 
 
-void ExampleAIModule::onPlayerLeft(BWAPI::Player* player) {
+void MarinesAIModule::onPlayerLeft(BWAPI::Player* player) {
     Broodwar->sendText("%s left the game.",player->getName().c_str());
 }
 
-//void ExampleAIModule::onNukeDetect(BWAPI::Position target) {
+//void MarinesAIModule::onNukeDetect(BWAPI::Position target) {
 //    if (target!=Positions::Unknown) {
 //        Broodwar->printf("Nuclear Launch Detected at (%d,%d)",target.x(),target.y());
 //    }
@@ -365,13 +365,13 @@ void ExampleAIModule::onPlayerLeft(BWAPI::Player* player) {
 //        Broodwar->printf("Nuclear Launch Detected");
 //    }
 //}
-//void ExampleAIModule::onUnitRenegade(BWAPI::Unit* unit) {
+//void MarinesAIModule::onUnitRenegade(BWAPI::Unit* unit) {
 //    if (!Broodwar->isReplay()) {
 //        Broodwar->sendText("A %s [%x] is now owned by %s",unit->getType().getName().c_str(),unit,unit->getPlayer()->getName().c_str());
 //    }
 //}
 
-bool ExampleAIModule::onSendText(std::string text) {
+bool MarinesAIModule::onSendText(std::string text) {
     if (text=="/show players") {
         showPlayers();
         return false;
@@ -408,7 +408,7 @@ DWORD WINAPI AnalyzeThread() {
     return 0;
 }
 
-void ExampleAIModule::drawStats() {
+void MarinesAIModule::drawStats() {
     std::set<Unit*> myUnits = Broodwar->self()->getUnits();
     Broodwar->drawTextScreen(5,0,"I have %d units:",myUnits.size());
     std::map<UnitType, int> unitTypeCounts;
@@ -425,14 +425,14 @@ void ExampleAIModule::drawStats() {
     }
 }
 
-void ExampleAIModule::showPlayers() {
+void MarinesAIModule::showPlayers() {
     std::set<Player*> players=Broodwar->getPlayers();
     for(std::set<Player*>::iterator i=players.begin();i!=players.end();i++) {
         Broodwar->printf("Player [%d]: %s is in force: %s",(*i)->getID(),(*i)->getName().c_str(), (*i)->getForce()->getName().c_str());
     }
 }
 
-void ExampleAIModule::showForces() {
+void MarinesAIModule::showForces() {
     std::set<Force*> forces=Broodwar->getForces();
     for(std::set<Force*>::iterator i=forces.begin();i!=forces.end();i++) {
         std::set<Player*> players=(*i)->getPlayers();

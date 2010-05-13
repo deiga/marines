@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ExampleAIModule"
-	ProjectGUID="{56DDBBA2-58FB-467D-8923-A214B16649F5}"
-	RootNamespace="ExampleAIModule"
+	Name="MarinesAIModule"
+	ProjectGUID="{CD84B7BC-E1CC-412F-9A35-8063C2C1AA14}"
+	RootNamespace="MarinesAIModule"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="..\..\..\bwapi-data\AI"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="2"
 			>
 			<Tool
@@ -39,12 +39,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="../../include"
+				Optimization="3"
 				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
 				WarningLevel="3"
+				WarnAsError="true"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -58,7 +59,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../../lib/BWAPI.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -109,12 +109,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="3"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="../../include"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
+				WarnAsError="false"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -129,11 +131,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="../../lib/BWAPI.lib ../../lib/BWTA.lib ../../lib/CGAL-vc90-mt.lib ../../lib/gmp-vc90-mt.lib ../../lib/libboost_thread-vc90-mt-1_38.lib ../../lib/mpfr-vc90-mt.lib"
-				GenerateDebugInformation="false"
-				ProgramDatabaseFile=""
+				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
+				CLRThreadAttribute="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -171,7 +173,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ExampleAIModule.cpp"
+				RelativePath=".\MarinesAIModule.cpp"
 				>
 			</File>
 		</Filter>
@@ -181,7 +183,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\ExampleAIModule.h"
+				RelativePath=".\MarinesAIModule.h"
 				>
 			</File>
 		</Filter>
