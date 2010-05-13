@@ -18,13 +18,14 @@ public:
     virtual void onFrame();
     virtual bool onSendText(std::string);
     virtual void onPlayerLeft(BWAPI::Player*);
-    //virtual void onNukeDetect(BWAPI::Position);
     virtual void onUnitCreate(BWAPI::Unit*);
     virtual void onUnitDestroy(BWAPI::Unit*);
-    virtual void onUnitMorph(BWAPI::Unit*);
     virtual void onUnitShow(BWAPI::Unit*);
     virtual void onUnitHide(BWAPI::Unit*);
-    //virtual void onUnitRenegade(BWAPI::Unit*);
+    /*virtual void onNukeDetect(BWAPI::Position);
+    virtual void onUnitMorph(BWAPI::Unit*);
+    virtual void onUnitRenegade(BWAPI::Unit*);*/
+    virtual BWAPI::Unit* getClosestMineral(BWAPI::Unit*);
     void drawStats(); //not part of BWAPI::AIModule
     void showPlayers();
     void showForces();
@@ -34,7 +35,6 @@ public:
     std::map<int, BWAPI::Unit*> sightedEnemies;
     virtual void printPlayers();
     virtual BWAPI::Unit* getClosestUnit(BWAPI::Unit*);
-    virtual BWAPI::Unit* getClosestMineral(BWAPI::Unit*);
     virtual void allUnitsAttackClosest();
     virtual BWAPI::Position getCenter(std::map<int, BWAPI::Unit*>);
     virtual void unitEvade(BWAPI::Unit*);
