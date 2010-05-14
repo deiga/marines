@@ -31,7 +31,7 @@ void MarinesAIModule::onStart() {
           (*i)->train(*Broodwar->self()->getRace().getWorker());
         }
       } else if ( UnitIsFighter(*i) ) {
-        ownUnits.insert(std::pair<int, Unit*>((*i)->getID(), (*i)));
+        ownUnits.insert(std::pair<Unit*, std::pair<bool, int>>((*i), std::pair<bool, int>(false, (*i)->getHitPoints() )));
       }
     }
     //Position temp = getGroupCenter(ownUnits);
@@ -75,13 +75,16 @@ void MarinesAIModule::onFrame() {
     if (Broodwar->getFrameCount() % 30 == 0) {
       //allUnitsAttackClosest();
     }
-    if (!sightedEnemies.empty()) {
-      for (std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
-        if ( healthThreshold((*it).second) ) {
-          unitEvade((*it).second);
+    if (Broodwar->getFrameCount() % 10 == 0) {
+      evadeUnitsIfAttacked();
+    }
+    /*if (!sightedEnemies.empty()) {
+      for (std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+        if ( healthThreshold((*it).first) ) {
+          unitEvade((*it).first);
         }
       }
-    }
+    }*/
   }
 
   drawStats();
@@ -185,7 +188,7 @@ void MarinesAIModule::onUnitDestroy(Unit* unit) {
       sightedEnemies.erase(unit->getID());
       //allUnitsAttackClosest();
     } else if (unit->getPlayer() == Broodwar->self()) {
-      ownUnits.erase(unit->getID());
+      ownUnits.erase(unit);
     }
   }
 }
@@ -195,8 +198,8 @@ void MarinesAIModule::onUnitShow(Unit* unit) {
     //Broodwar->printf("UnitType: %s", unit->getType().getName().c_str());
     sightedEnemies.insert(std::pair<int, Unit*>(unit->getID(), unit));
     if (sightedEnemies.size() == 1) {
-      for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
-        (*it).second->attackUnit(unit);
+      for(std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+        (*it).first->attackUnit(unit);
       } 
     }
   }
@@ -350,19 +353,19 @@ void MarinesAIModule::MoveToLine() {
   Position mapCenter = getMapCenter();
   Position groupCenter = getGroupCenter(ownUnits);
   int diffX = groupCenter.x() - mapCenter.x();
-  int xCoord = (diffX * 0.8) * (-1) + groupCenter.x();
+  int xCoord = (int)(diffX * 0.75) * (-1) + groupCenter.x();
   int y = 800;
-  Broodwar->printf("Target pos: x: %d, y: %d", xCoord, y);
-  for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+  Broodwar->printf("Target pos: x: %d, y: %d", xCoord, y);  
+  for(std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
     y += 50;
-    (*it).second->rightClick(Position(xCoord, y));
+    (*it).first->rightClick(Position(xCoord, y));
   }
 }
 
 void MarinesAIModule::allUnitsAttackClosest() {
-  for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+  for(std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
     if (!sightedEnemies.empty()) {
-      (*it).second->attackUnit(getClosestUnit((*it).second));
+      (*it).first->attackUnit(getClosestUnit((*it).first));
     }
   }
 }
@@ -392,17 +395,47 @@ Position MarinesAIModule::getGroupCenter(std::map<int, Unit*> unitGroup) {
   return temp;
 }
 
+Position MarinesAIModule::getGroupCenter(std::map<Unit*, std::pair<bool, int>> unitGroup) {
+  if (unitGroup.empty()) {
+    return Positions::None;
+  }
+  if (unitGroup.size() == 1) {
+    return (unitGroup.begin()->first->getPosition());
+  }
+  int count, x, y;
+  count = x = y = 0;
+  for(std::map<Unit*, std::pair<bool, int>>::const_iterator i = unitGroup.begin(); i != unitGroup.end(); i++) {
+    Position p((*i).first->getPosition());
+    if ( p != Positions::None && p != Positions::Unknown && p != Positions::Invalid ) {
+      count++;
+      x += p.x();
+      y += p.y();
+    }
+  }
+  if (count == 0) {
+    return Positions::None;
+  }
+
+  Position temp = Position( x / count, y / count );
+  return temp;
+}
+
 void MarinesAIModule::unitEvade(Unit* unit) {
   Position path = getEvadePath(unit);
   unit->rightClick(path);
+  ownUnits[unit].first = true;
   Broodwar->drawLine(CoordinateType::Map,unit->getPosition().x(),unit->getPosition().y(),path.x(),path.y(),Colors::Green);
+}
+
+bool MarinesAIModule::isFleeing(Unit* unit) {
+  return ownUnits[unit].first;
 }
 
 Position MarinesAIModule::calcEvadePath(int xDir, int yDir, Unit* unit) {
   int xCoord, yCoord;
   if ( unit->getType() == UnitTypes::Protoss_Dragoon ) {
-    xCoord = (xDir / 4) * (-1) + unit->getPosition().x();
-    yCoord = (yDir / 4) * (-1) + unit->getPosition().y();
+    xCoord = (int)(xDir / 3.5) * (-1) + unit->getPosition().x();
+    yCoord = (int)(yDir / 3.5) * (-1) + unit->getPosition().y();
   } else if ( unit->getType() == UnitTypes::Protoss_Zealot ) {
 
   }
@@ -457,4 +490,20 @@ std::pair<int, int> MarinesAIModule::calcMapCenter() {
   width = Broodwar->mapWidth();
   center_coords = std::pair<int, int>(height / 2, width / 2);
   return center_coords;
+}
+
+void MarinesAIModule::evadeUnitsIfAttacked() {
+  for(std::map<Unit*, std::pair<bool, int>>::iterator uIt = ownUnits.begin(); uIt != ownUnits.end(); uIt++) {
+    Unit* currUnit = (*uIt).first;
+    if (isAttacked(currUnit)) {
+      unitEvade(currUnit);
+    }
+    ownUnits[currUnit].second = currUnit->getHitPoints();
+  }
+}
+
+bool MarinesAIModule::isAttacked(Unit* unit) {
+  int lastHP = ownUnits[unit].second;
+  int currHP = unit->getHitPoints();
+  return (int)(lastHP * 0.8) >= currHP;
 }

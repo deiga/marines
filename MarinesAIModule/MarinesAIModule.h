@@ -31,12 +31,13 @@ public:
   void showForces();
   bool show_visibility_data;
 
-  std::map<int, BWAPI::Unit*> ownUnits;
+  std::map<BWAPI::Unit*, std::pair<bool, int>> ownUnits;
   std::map<int, BWAPI::Unit*> sightedEnemies;
   virtual void printPlayers();
   virtual BWAPI::Unit* getClosestUnit(BWAPI::Unit*);
   virtual void allUnitsAttackClosest();
   virtual BWAPI::Position getGroupCenter(std::map<int, BWAPI::Unit*>);
+  virtual BWAPI::Position getGroupCenter(std::map<BWAPI::Unit*, std::pair<bool, int>>);
   virtual void unitEvade(BWAPI::Unit*);
   virtual BWAPI::Position getEvadePath(BWAPI::Unit*);
   virtual bool healthThreshold(BWAPI::Unit*);
@@ -45,4 +46,7 @@ public:
   virtual bool UnitIsFighter(BWAPI::Unit*);
   virtual BWAPI::Position getMapCenter();
   virtual std::pair<int, int> calcMapCenter();
+  virtual bool isFleeing(BWAPI::Unit*);
+  virtual void evadeUnitsIfAttacked();
+  virtual bool isAttacked(BWAPI::Unit*);
 };
