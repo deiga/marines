@@ -35,6 +35,7 @@ public:
   std::map<int, BWAPI::Unit*> sightedEnemies;
   virtual void printPlayers();
   virtual BWAPI::Unit* getClosestUnit(BWAPI::Unit*);
+  virtual BWAPI::Unit* getClosestOwnUnit(BWAPI::Unit*);
   virtual void allUnitsAttackClosest();
   virtual BWAPI::Position getGroupCenter(std::map<int, BWAPI::Unit*>);
   virtual BWAPI::Position getGroupCenter(std::map<BWAPI::Unit*, std::pair<bool, int>>);
@@ -49,4 +50,5 @@ public:
   virtual bool isFleeing(BWAPI::Unit*);
   virtual void evadeUnitsIfAttacked();
   virtual bool isAttacked(BWAPI::Unit*);
+  virtual bool isZealot(BWAPI::Unit*);
 };

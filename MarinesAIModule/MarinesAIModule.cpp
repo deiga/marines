@@ -2,15 +2,15 @@
 using namespace BWAPI;
 
 void MarinesAIModule::onStart() {
-  Broodwar->setLocalSpeed(60);
+  Broodwar->setLocalSpeed(45);
   Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
   // Enable some cheat flags
-  Broodwar->enableFlag(Flag::UserInput);
+  // Broodwar->enableFlag(Flag::UserInput);
   // Uncomment to enable complete map information
-  //Broodwar->enableFlag(Flag::CompleteMapInformation);
+  // Broodwar->enableFlag(Flag::CompleteMapInformation);
 
   //read map information into BWTA so terrain analysis can be done in another thread
-  BWTA::readMap();
+  // BWTA::readMap();
   analyzed=false;
   analysis_just_finished=false;
   show_visibility_data=false;
@@ -72,16 +72,19 @@ void MarinesAIModule::onFrame() {
     return;
   }
   else {
-    if (Broodwar->getFrameCount() % 30 == 0) {
+    if (Broodwar->getFrameCount() % 24 == 0) {
       allUnitsAttackClosest();
     }
-    if (Broodwar->getFrameCount() % 10 == 0) {
+    if (Broodwar->getFrameCount() % 24 == 0) {
       evadeUnitsIfAttacked();
     }
     for (std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
       if (isFleeing((*it).first) && (*it).first->isIdle()) {
         ownUnits[(*it).first].first = false;
       }
+    }
+    if (sightedEnemies.empty() && Broodwar->getFrameCount() >= 480) {
+      MoveToLine();
     }
     /*if (!sightedEnemies.empty()) {
       for (std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
@@ -360,7 +363,7 @@ void MarinesAIModule::MoveToLine() {
   int diffX = groupCenter.x() - mapCenter.x();
   int xCoord = (int)(diffX * 0.75) * (-1) + groupCenter.x();
   int y = 800;
-  Broodwar->printf("Target pos: x: %d, y: %d", xCoord, y);  
+  //Broodwar->printf("Target pos: x: %d, y: %d", xCoord, y);  
   for(std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
     y += 50;
     (*it).first->rightClick(Position(xCoord, y));
@@ -370,7 +373,10 @@ void MarinesAIModule::MoveToLine() {
 void MarinesAIModule::allUnitsAttackClosest() {
   for(std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
     if (!sightedEnemies.empty() && !isFleeing((*it).first)) {
-      (*it).first->attackUnit(getClosestUnit((*it).first));
+      Unit* target = getClosestUnit((*it).first);
+      Unit* own = (*it).first;
+      own->attackUnit(target);
+      Broodwar->drawLine(CoordinateType::Map, own->getPosition().x(), own->getPosition().y(), target->getPosition().x(), target->getPosition().y(), Colors::Red);
     }
   }
 }
@@ -427,9 +433,12 @@ Position MarinesAIModule::getGroupCenter(std::map<Unit*, std::pair<bool, int>> u
 
 void MarinesAIModule::unitEvade(Unit* unit) {
   Position path = getEvadePath(unit);
+  Position origPos = unit->getPosition();
   unit->rightClick(path);
   ownUnits[unit].first = true;
   Broodwar->drawLine(CoordinateType::Map,unit->getPosition().x(),unit->getPosition().y(),path.x(),path.y(),Colors::Green);
+  while (unit->getPosition() != path) {}
+  unit->rightClick(origPos);
 }
 
 bool MarinesAIModule::isFleeing(Unit* unit) {
@@ -455,7 +464,7 @@ Position MarinesAIModule::getEvadePath(Unit* unit) {
   return calcEvadePath(diffX, diffY, unit);
 }
 
-Unit* MarinesAIModule::getClosestUnit(Unit* unit) {
+Unit* MarinesAIModule::getClosestUnit(Unit* unit) { // getClosestZealotInRange else getUnitInRange
   std::pair<double, Unit*> minDist = std::pair<double, Unit*>(9999999.0, NULL);
 
   for(std::map<int, Unit*>::const_iterator it = sightedEnemies.begin(); it != sightedEnemies.end(); it++) {
@@ -465,6 +474,24 @@ Unit* MarinesAIModule::getClosestUnit(Unit* unit) {
   }
   //Broodwar->printf("Player: %s", minDist.second->getPlayer()->getName().c_str());
   return minDist.second;
+}
+
+Unit* MarinesAIModule::getClosestOwnUnit(Unit* unit) { // getClosestZealotInRange else getUnitInRange
+  std::pair<double, Unit*> minDist = std::pair<double, Unit*>(9999999.0, NULL);
+/*
+  for(std::map<int, Unit*>::const_iterator it = sightedEnemies.begin(); it != sightedEnemies.end(); it++) {
+    if ((*it).second->getDistance(unit) < minDist.first) {
+      minDist = std::pair<double, Unit*>((*it).second->getDistance(unit), (*it).second);
+    }
+  }
+  //Broodwar->printf("Player: %s", minDist.second->getPlayer()->getName().c_str());*/
+  return minDist.second;
+}
+
+
+
+bool MarinesAIModule::isZealot(Unit* target) {
+  return target->getType() == UnitTypes::Protoss_Zealot;
 }
 
 bool MarinesAIModule::healthThreshold(Unit* target) {
