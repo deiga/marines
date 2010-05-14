@@ -44,5 +44,5 @@ public:
   virtual void MoveToLine();
   virtual bool UnitIsFighter(BWAPI::Unit*);
   virtual BWAPI::Position getMapCenter();
-  virtual std::pair<int, int> calculateMapCenter();
+  virtual std::pair<int, int> calcMapCenter();
 };

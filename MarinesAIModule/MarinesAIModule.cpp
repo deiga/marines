@@ -322,9 +322,9 @@ void MarinesAIModule::showForces() {
 void MarinesAIModule::printPlayers() {
   if (Broodwar->isReplay()) {
     Broodwar->printf("The following players are in this replay:");
-    for(std::set<Player*>::iterator p_it = Broodwar->getPlayers().begin(); p_it != Broodwar->getPlayers().end(); p_it++) {
-      if (!(*p_it)->getUnits().empty() && !(*p_it)->isNeutral()) {
-        Broodwar->printf("%s, playing as a %s",(*p_it)->getName().c_str(),(*p_it)->getRace().getName().c_str());
+    for(std::set<Player*>::iterator pIt = Broodwar->getPlayers().begin(); pIt != Broodwar->getPlayers().end(); pIt++) {
+      if (!(*pIt)->getUnits().empty() && !(*pIt)->isNeutral()) {
+        Broodwar->printf("%s, playing as a %s",(*pIt)->getName().c_str(),(*pIt)->getRace().getName().c_str());
       }
     }
   } else {
@@ -336,9 +336,9 @@ void MarinesAIModule::printPlayers() {
 
 Unit* MarinesAIModule::getClosestMineral(Unit* unit) {
   Unit* closestMineral = NULL;
-  for(std::set<Unit*>::iterator m_it = Broodwar->getMinerals().begin(); m_it != Broodwar->getMinerals().end(); m_it++) {
-    if ( closestMineral == NULL || unit->getDistance(*m_it) < unit->getDistance(closestMineral) ) {
-      closestMineral = *m_it;
+  for(std::set<Unit*>::iterator mIt = Broodwar->getMinerals().begin(); mIt != Broodwar->getMinerals().end(); mIt++) {
+    if ( closestMineral == NULL || unit->getDistance(*mIt) < unit->getDistance(closestMineral) ) {
+      closestMineral = *mIt;
     }
   }
   return closestMineral;
@@ -347,10 +347,15 @@ Unit* MarinesAIModule::getClosestMineral(Unit* unit) {
 // ---------- Own functions ----------
 
 void MarinesAIModule::MoveToLine() {
+  Position mapCenter = getMapCenter();
+  Position groupCenter = getGroupCenter(ownUnits);
+  int diffX = groupCenter.x() - mapCenter.x();
+  int xCoord = (diffX * 0.8) * (-1) + groupCenter.x();
   int y = 800;
+  Broodwar->printf("Target pos: x: %d, y: %d", xCoord, y);
   for(std::map<int, Unit*>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
     y += 50;
-    (*it).second->rightClick(Position(600, y));
+    (*it).second->rightClick(Position(xCoord, y));
   }
 }
 
@@ -383,27 +388,25 @@ Position MarinesAIModule::getGroupCenter(std::map<int, Unit*> unitGroup) {
     return Positions::None;
   }
 
-  Position temp = Position( x/count, y/count );
+  Position temp = Position( x / count, y / count );
   return temp;
 }
 
 void MarinesAIModule::unitEvade(Unit* unit) {
   Position path = getEvadePath(unit);
-  /*Broodwar->printf("Path: x: %d, y: %d", path.x(), path.y());
-  Broodwar->printf("Unit: x: %d, y: %d", unit->getPosition().x(), unit->getPosition().y());*/
   unit->rightClick(path);
   Broodwar->drawLine(CoordinateType::Map,unit->getPosition().x(),unit->getPosition().y(),path.x(),path.y(),Colors::Green);
 }
 
-Position MarinesAIModule::calcEvadePath(int x_direction, int y_direction, Unit* unit) {
-  int x_coord, y_coord;
+Position MarinesAIModule::calcEvadePath(int xDir, int yDir, Unit* unit) {
+  int xCoord, yCoord;
   if ( unit->getType() == UnitTypes::Protoss_Dragoon ) {
-    x_coord = (x_direction / 2) * (-1) + unit->getPosition().x();
-    y_coord = (y_direction / 2) * (-1) + unit->getPosition().y();
+    xCoord = (xDir / 4) * (-1) + unit->getPosition().x();
+    yCoord = (yDir / 4) * (-1) + unit->getPosition().y();
   } else if ( unit->getType() == UnitTypes::Protoss_Zealot ) {
 
   }
-  return Position(x_coord, y_coord);
+  return Position(xCoord, yCoord);
 }
 
 Position MarinesAIModule::getEvadePath(Unit* unit) {
@@ -411,7 +414,6 @@ Position MarinesAIModule::getEvadePath(Unit* unit) {
   Position unitPos = unit->getPosition();
   int diffX = enemyPos.x() - unitPos.x();
   int diffY = enemyPos.y() - unitPos.y();
-  //Broodwar->printf("x: %d, y: %d", diffX, diffY);
   return calcEvadePath(diffX, diffY, unit);
 }
 
@@ -444,11 +446,11 @@ bool MarinesAIModule::UnitIsFighter(Unit* unit) {
 }
 
 Position MarinesAIModule::getMapCenter() {
-  std::pair<int, int> temp = calculateMapCenter();
+  std::pair<int, int> temp = calcMapCenter();
   return Position(temp.first*TILE_SIZE, temp.second*TILE_SIZE);
 }
 
-std::pair<int, int> MarinesAIModule::calculateMapCenter() {
+std::pair<int, int> MarinesAIModule::calcMapCenter() {
   std::pair<int, int> center_coords = std::pair<int, int>(0, 0);
   int height, width;
   height = Broodwar->mapHeight();
