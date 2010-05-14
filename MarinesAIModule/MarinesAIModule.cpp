@@ -2,7 +2,7 @@
 using namespace BWAPI;
 
 void MarinesAIModule::onStart() {
-  Broodwar->setLocalSpeed(45);
+  Broodwar->setLocalSpeed(55);
   Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
   // Enable some cheat flags
   // Broodwar->enableFlag(Flag::UserInput);
@@ -361,7 +361,9 @@ void MarinesAIModule::MoveToLine() {
   Position mapCenter = getMapCenter();
   Position groupCenter = getGroupCenter(ownUnits);
   int diffX = groupCenter.x() - mapCenter.x();
+  int diffY = groupCenter.y() - mapCenter.y();
   int xCoord = (int)(diffX * 0.75) * (-1) + groupCenter.x();
+  int yCoord = groupCenter.x();
   int y = 800;
   //Broodwar->printf("Target pos: x: %d, y: %d", xCoord, y);  
   for(std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
@@ -437,8 +439,6 @@ void MarinesAIModule::unitEvade(Unit* unit) {
   unit->rightClick(path);
   ownUnits[unit].first = true;
   Broodwar->drawLine(CoordinateType::Map,unit->getPosition().x(),unit->getPosition().y(),path.x(),path.y(),Colors::Green);
-  while (unit->getPosition() != path) {}
-  unit->rightClick(origPos);
 }
 
 bool MarinesAIModule::isFleeing(Unit* unit) {
@@ -448,10 +448,11 @@ bool MarinesAIModule::isFleeing(Unit* unit) {
 Position MarinesAIModule::calcEvadePath(int xDir, int yDir, Unit* unit) {
   int xCoord, yCoord;
   if ( unit->getType() == UnitTypes::Protoss_Dragoon ) {
-    xCoord = (int)(xDir / 3.5) * (-1) + unit->getPosition().x();
-    yCoord = (int)(yDir / 3.5) * (-1) + unit->getPosition().y();
+    xCoord = (int)(xDir / 3) * (-1) + unit->getPosition().x();
+    yCoord = (int)(yDir / 3) * (-1) + unit->getPosition().y();
   } else if ( unit->getType() == UnitTypes::Protoss_Zealot ) {
-
+    xCoord = (int)(xDir * 1.5) * (-1) + unit->getPosition().x();
+    yCoord = (int)(yDir * 1.5) * (-1) + unit->getPosition().y();
   }
   return Position(xCoord, yCoord);
 }
