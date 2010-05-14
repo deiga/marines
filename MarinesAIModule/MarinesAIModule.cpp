@@ -73,10 +73,15 @@ void MarinesAIModule::onFrame() {
   }
   else {
     if (Broodwar->getFrameCount() % 30 == 0) {
-      //allUnitsAttackClosest();
+      allUnitsAttackClosest();
     }
     if (Broodwar->getFrameCount() % 10 == 0) {
       evadeUnitsIfAttacked();
+    }
+    for (std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
+      if (isFleeing((*it).first) && (*it).first->isIdle()) {
+        ownUnits[(*it).first].first = false;
+      }
     }
     /*if (!sightedEnemies.empty()) {
       for (std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
@@ -364,7 +369,7 @@ void MarinesAIModule::MoveToLine() {
 
 void MarinesAIModule::allUnitsAttackClosest() {
   for(std::map<Unit*, std::pair<bool, int>>::const_iterator it = ownUnits.begin(); it != ownUnits.end(); it++) {
-    if (!sightedEnemies.empty()) {
+    if (!sightedEnemies.empty() && !isFleeing((*it).first)) {
       (*it).first->attackUnit(getClosestUnit((*it).first));
     }
   }
