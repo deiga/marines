@@ -7,8 +7,12 @@
 static bool analyzed;
 static bool analysis_just_finished;
 static BWTA::Region* home;
+static BWTA::BaseLocation* homebase;
 static BWTA::Region* enemy_base;
+static BWAPI::TilePosition ownStartPosition;
+static int buildDistance;
 DWORD WINAPI AnalyzeThread();
+BWTA::RectangleArray<bool> reservedMap;
 
 class MarinesAIModule : public BWAPI::AIModule
 {
@@ -31,6 +35,10 @@ public:
   void showForces();
   bool show_visibility_data;
 
+  virtual BWAPI::TilePosition getBuildLocationNear(BWAPI::TilePosition, BWAPI::UnitType);
+  virtual bool canBuildHereWithSpace(BWAPI::TilePosition, BWAPI::UnitType);	
+  virtual bool canBuildHere(BWAPI::TilePosition, BWAPI::UnitType);
+  virtual bool buildable(int, int);
   std::map<BWAPI::Unit*, std::pair<bool, int>> ownUnits;
   std::map<int, BWAPI::Unit*> sightedEnemies;
   virtual void printPlayers();

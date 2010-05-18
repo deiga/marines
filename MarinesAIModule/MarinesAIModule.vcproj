@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="..\..\..\bwapi-data\AI"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="2"
 			>
 			<Tool
@@ -39,12 +39,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
-				MinimalRebuild="true"
+				Optimization="0"
+				AdditionalIncludeDirectories="../../include"
+				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
-				RuntimeLibrary="3"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
-				WarnAsError="true"
+				WarnAsError="false"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
@@ -59,6 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="../../lib/BWAPI.lib ../../lib/BWTA.lib ../../lib/CGAL-vc90-mt.lib ../../lib/gmp-vc90-mt.lib ../../lib/libboost_thread-vc90-mt-1_38.lib ../../lib/mpfr-vc90-mt.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
