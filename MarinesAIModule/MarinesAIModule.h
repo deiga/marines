@@ -35,14 +35,8 @@ public:
   void showForces();
   bool show_visibility_data;
 
-  virtual BWAPI::TilePosition getBuildLocationNear(BWAPI::TilePosition, BWAPI::UnitType);
-  virtual bool canBuildHereWithSpace(BWAPI::TilePosition, BWAPI::UnitType);	
-  virtual bool canBuildHere(BWAPI::TilePosition, BWAPI::UnitType);
-  virtual bool buildable(int, int);
   std::map<BWAPI::Unit*, std::pair<bool, int>> ownUnits;
   std::map<int, BWAPI::Unit*> sightedEnemies;
-  std::vector<BWAPI::Unit*> mineral_probes;
-  std::vector<BWAPI::Unit*> gas_probes;
   virtual void printPlayers();
   virtual BWAPI::Unit* getClosestUnit(BWAPI::Unit*);
   virtual BWAPI::Unit* getClosestOwnUnit(BWAPI::Unit*);
@@ -61,4 +55,12 @@ public:
   virtual void evadeUnitsIfAttacked();
   virtual bool isAttacked(BWAPI::Unit*);
   virtual bool isZealot(BWAPI::Unit*);
+  
+  virtual BWAPI::TilePosition getBuildLocationNear(BWAPI::TilePosition, BWAPI::UnitType);
+  virtual bool canBuildHereWithSpace(BWAPI::TilePosition, BWAPI::UnitType);	
+  virtual bool canBuildHere(BWAPI::TilePosition, BWAPI::UnitType);
+  virtual bool buildable(int, int);
+  virtual BWAPI::Unit* idleProbe();
+  std::vector<BWAPI::Unit*> mineral_probes;
+  std::vector<BWAPI::Unit*> gas_probes;
 };

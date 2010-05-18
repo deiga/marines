@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/112/trunk/BWSAL/lib
+END
+gmp-vc90-mt.lib
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/2/trunk/BWSAL/lib/gmp-vc90-mt.lib
+END
+mpfr-vc90-mt.lib
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/2/trunk/BWSAL/lib/mpfr-vc90-mt.lib
+END
+CGAL-vc90-mt.lib
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/2/trunk/BWSAL/lib/CGAL-vc90-mt.lib
+END
+libboost_thread-vc90-mt-1_38.lib
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/2/trunk/BWSAL/lib/libboost_thread-vc90-mt-1_38.lib
+END

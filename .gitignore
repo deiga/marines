@@ -2,3 +2,5 @@
 /ExampleAIModule.ncb
 /Debug
 *.ncb
+/MarinesAIModule/Release
+/MarinesAIModule/Debug

@@ -1,0 +1,155 @@
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/324/trunk/BWSAL/include/BWAPI
+END
+UpgradeType.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/113/trunk/BWSAL/include/BWAPI/UpgradeType.h
+END
+Error.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/90/trunk/BWSAL/include/BWAPI/Error.h
+END
+CoordinateType.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/CoordinateType.h
+END
+WeaponType.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/114/trunk/BWSAL/include/BWAPI/WeaponType.h
+END
+Player.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/322/trunk/BWSAL/include/BWAPI/Player.h
+END
+PlayerType.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/PlayerType.h
+END
+Force.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/Force.h
+END
+Latency.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/Latency.h
+END
+AIModule.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/113/trunk/BWSAL/include/BWAPI/AIModule.h
+END
+Input.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/323/trunk/BWSAL/include/BWAPI/Input.h
+END
+Position.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/322/trunk/BWSAL/include/BWAPI/Position.h
+END
+Flag.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/Flag.h
+END
+Game.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/322/trunk/BWSAL/include/BWAPI/Game.h
+END
+AttackType.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/114/trunk/BWSAL/include/BWAPI/AttackType.h
+END
+Race.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/Race.h
+END
+Order.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/Order.h
+END
+Constants.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/Constants.h
+END
+UnitSizeType.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/UnitSizeType.h
+END
+Color.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/114/trunk/BWSAL/include/BWAPI/Color.h
+END
+Unit.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/324/trunk/BWSAL/include/BWAPI/Unit.h
+END
+DamageType.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/DamageType.h
+END
+UnitType.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/113/trunk/BWSAL/include/BWAPI/UnitType.h
+END
+ExplosionType.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/114/trunk/BWSAL/include/BWAPI/ExplosionType.h
+END
+TilePosition.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/2/trunk/BWSAL/include/BWAPI/TilePosition.h
+END
+TechType.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/114/trunk/BWSAL/include/BWAPI/TechType.h
+END

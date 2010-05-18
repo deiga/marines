@@ -1,0 +1,137 @@
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/!svn/ver/331/trunk/BWSAL/include
+END
+BuildManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/322/trunk/BWSAL/include/BuildManager.h
+END
+UnitGroup.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/287/trunk/BWSAL/include/UnitGroup.h
+END
+BWTA.h
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/253/trunk/BWSAL/include/BWTA.h
+END
+BWAPI.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/322/trunk/BWSAL/include/BWAPI.h
+END
+EnhancedUI.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/302/trunk/BWSAL/include/EnhancedUI.h
+END
+RectangleArray.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/238/trunk/BWSAL/include/RectangleArray.h
+END
+DefenseManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/302/trunk/BWSAL/include/DefenseManager.h
+END
+WorkerManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/292/trunk/BWSAL/include/WorkerManager.h
+END
+BaseManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/7/trunk/BWSAL/include/BaseManager.h
+END
+BorderManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/302/trunk/BWSAL/include/BorderManager.h
+END
+Arbitrator.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/2/trunk/BWSAL/include/Arbitrator.h
+END
+TechManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/103/trunk/BWSAL/include/TechManager.h
+END
+MorphManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/327/trunk/BWSAL/include/MorphManager.h
+END
+InformationManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/302/trunk/BWSAL/include/InformationManager.h
+END
+ProductionManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/327/trunk/BWSAL/include/ProductionManager.h
+END
+UpgradeManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/247/trunk/BWSAL/include/UpgradeManager.h
+END
+BuildingPlacer.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/322/trunk/BWSAL/include/BuildingPlacer.h
+END
+ConstructionManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/262/trunk/BWSAL/include/ConstructionManager.h
+END
+BuildOrderManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/179/trunk/BWSAL/include/BuildOrderManager.h
+END
+UnitGroupManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/220/trunk/BWSAL/include/UnitGroupManager.h
+END
+SupplyManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/320/trunk/BWSAL/include/SupplyManager.h
+END
+ScoutManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/322/trunk/BWSAL/include/ScoutManager.h
+END
