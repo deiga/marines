@@ -12,7 +12,7 @@ static BWTA::Region* enemy_base;
 static BWAPI::TilePosition ownStartPosition;
 static int buildDistance;
 DWORD WINAPI AnalyzeThread();
-BWTA::RectangleArray<bool> reservedMap;
+static BWTA::RectangleArray<bool> reservedMap;
 
 class MarinesAIModule : public BWAPI::AIModule
 {
@@ -41,6 +41,8 @@ public:
   virtual bool buildable(int, int);
   std::map<BWAPI::Unit*, std::pair<bool, int>> ownUnits;
   std::map<int, BWAPI::Unit*> sightedEnemies;
+  std::vector<BWAPI::Unit*> mineral_probes;
+  std::vector<BWAPI::Unit*> gas_probes;
   virtual void printPlayers();
   virtual BWAPI::Unit* getClosestUnit(BWAPI::Unit*);
   virtual BWAPI::Unit* getClosestOwnUnit(BWAPI::Unit*);

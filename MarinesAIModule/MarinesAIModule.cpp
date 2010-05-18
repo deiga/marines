@@ -228,6 +228,10 @@ void MarinesAIModule::onFrame() {
     if (sightedEnemies.empty() && Broodwar->getFrameCount() >= 480) {
       MoveToLine();
     }
+    if (Broodwar->getFrameCount() % 5 == 0) {
+      Unit* idle_probe = idleProbe();
+
+    }
 
 	if (Broodwar->self()->minerals() > 100) {
 		Unit* workwork;
@@ -251,30 +255,30 @@ void MarinesAIModule::onFrame() {
   }
 
   drawStats();
-  if (analyzed && Broodwar->getFrameCount()%30==0) {
-    //order one of our workers to guard our chokepoint.
-    for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++) {
-      if ((*i)->getType().isWorker()) {
-        //get the chokepoints linked to our home region
-        std::set<BWTA::Chokepoint*> chokepoints = home->getChokepoints();
-        double min_length = 10000;
-        BWTA::Chokepoint* choke = NULL;
+  //if (analyzed && Broodwar->getFrameCount()%30==0) {
+  //  //order one of our workers to guard our chokepoint.
+  //  for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++) {
+  //    if ((*i)->getType().isWorker()) {
+  //      //get the chokepoints linked to our home region
+  //      std::set<BWTA::Chokepoint*> chokepoints = home->getChokepoints();
+  //      double min_length = 10000;
+  //      BWTA::Chokepoint* choke = NULL;
 
-        //iterate through all chokepoints and look for the one with the smallest gap (least width)
-        for(std::set<BWTA::Chokepoint*>::iterator c = chokepoints.begin(); c != chokepoints.end(); c++) {
-          double length = (*c)->getWidth();
-          if ( length < min_length || choke == NULL ) {
-            min_length = length;
-            choke = *c;
-          }
-        }
+  //      //iterate through all chokepoints and look for the one with the smallest gap (least width)
+  //      for(std::set<BWTA::Chokepoint*>::iterator c = chokepoints.begin(); c != chokepoints.end(); c++) {
+  //        double length = (*c)->getWidth();
+  //        if ( length < min_length || choke == NULL ) {
+  //          min_length = length;
+  //          choke = *c;
+  //        }
+  //      }
 
-        //order the worker to move to the center of the gap
-        (*i)->rightClick(choke->getCenter());
-        break;
-      }
-    }
-  }
+  //      //order the worker to move to the center of the gap
+  //      (*i)->rightClick(choke->getCenter());
+  //      break;
+  //    }
+  //  }
+  //}
 
   if (analyzed) {
     //we will iterate through all the base locations, and draw their outlines.
