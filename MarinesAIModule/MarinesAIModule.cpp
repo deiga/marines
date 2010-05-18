@@ -190,6 +190,9 @@ bool MarinesAIModule::buildable(int x, int y)
   return true;
 }
 
+Unit* MarinesAIModule::idleProbe() {
+  return ownUnits.begin()->first;
+}
 
 void MarinesAIModule::onFrame() {
   if (show_visibility_data) {    
@@ -229,7 +232,7 @@ void MarinesAIModule::onFrame() {
       MoveToLine();
     }
     if (Broodwar->getFrameCount() % 5 == 0) {
-      Unit* idle_probe = idleProbe();
+     // Unit* idle_probe = idleProbe();
 
     }
 
