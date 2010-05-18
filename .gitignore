@@ -4,3 +4,4 @@
 *.ncb
 /MarinesAIModule/Release
 /MarinesAIModule/Debug
+.svn

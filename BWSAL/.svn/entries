@@ -1,80 +1,0 @@
-10
-
-dir
-334
-http://bwsal.googlecode.com/svn/trunk/BWSAL
-http://bwsal.googlecode.com/svn
-
-
-
-2010-04-11T07:43:40.498341Z
-334
-lowerlogic
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-e6d74fca-808f-11de-be1a-55d290844418
-
-Chaoslauncher
-dir
-
-BasicAIModule
-dir
-
-include
-dir
-
-lib
-dir
-
-COPYING
-file
-
-
-
-
-2010-05-18T09:20:01.028600Z
-ed7e492ee44e70125a5d42e118354a13
-2009-12-19T21:28:30.416876Z
-209
-lowerlogic
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-18097
-
-Starcraft
-dir
-
-WINDOWS
-dir
-
