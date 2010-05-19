@@ -63,7 +63,7 @@ void BasicAIModule::onStart()
   //make the basic production facility
   
   this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Forge, 60);
-  this->buildOrderManager->buildAdditional(50,UnitTypes::Protoss_Zealot,70);
+  this->buildOrderManager->buildAdditional(45,UnitTypes::Protoss_Zealot,70);
   this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Gateway,60);
 
   this->workerManager->enableAutoBuild();
@@ -95,6 +95,9 @@ void BasicAIModule::onEnd(bool isWinner)
 
 void BasicAIModule::expander() {
   BWTA::BaseLocation* newbase = &getNearestExpansion();
+  if (newbase == NULL) {
+    return;
+  }
   //Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
   marines_log << Broodwar->getFrameCount() << ": Expand to (" << newbase->getTilePosition().x() << ", " << newbase->getTilePosition().y() << ")!" << endl;
 	this->baseManager->expand(newbase, 50);
@@ -123,7 +126,6 @@ void BasicAIModule::onFrame()
   drawStats();
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0) {
-    this->buildOrderManager->buildAdditional(20, UnitTypes::Protoss_Zealot, 60);
     int zealot_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot);
     marines_log << Broodwar->getFrameCount() << ": Planning to Expand! " << endl;
     if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
@@ -192,6 +194,7 @@ void BasicAIModule::onFrame()
 }
 
 BWTA::BaseLocation& BasicAIModule::getNearestExpansion(){
+  marines_log << Broodwar->getFrameCount() << ": getNearestExpansion()" << endl;
 	set<BWTA::BaseLocation*> pesat = BWTA::getBaseLocations();
 	pair<double, BWTA::BaseLocation*> distance = pair<double, BWTA::BaseLocation*>(99999.0, NULL);
 	for(set<BWTA::BaseLocation*>::const_iterator b = pesat.begin(); b != pesat.end(); b++){
@@ -228,6 +231,12 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
   this->defenseManager->onRemoveUnit(unit);
   this->informationManager->onUnitDestroy(unit);
   this->baseManager->onRemoveUnit(unit);
+  if (unit->getType() == UnitTypes::Protoss_Zealot) {
+    this->buildOrderManager->buildAdditional(5,UnitTypes::Protoss_Zealot,45);
+  }
+  else if (unit->getType() == UnitTypes::Protoss_Dragoon) {
+    this->buildOrderManager->buildAdditional(3,UnitTypes::Protoss_Dragoon,50);
+  }
 }
 
 void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
