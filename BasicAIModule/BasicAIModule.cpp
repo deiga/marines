@@ -59,13 +59,13 @@ void BasicAIModule::onStart()
   }
   this->buildOrderManager->enableDependencyResolver();
   //make the basic production facility
-
+  
+  this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Forge, 60);
   this->buildOrderManager->buildAdditional(120,UnitTypes::Protoss_Zealot,70);
-  this->buildOrderManager->buildAdditional(120,UnitTypes::Protoss_Dragoon,50);
   this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Gateway,60);
 
   this->workerManager->enableAutoBuild();
-  this->workerManager->setAutoBuildPriority(40);
+  this->workerManager->setAutoBuildPriority(90);
 }
 
 BasicAIModule::~BasicAIModule()
@@ -117,14 +117,20 @@ void BasicAIModule::onFrame()
   this->arbitrator.update();
   drawStats();
 
-  if (Broodwar->getFrameCount() % 3000 == 0) {
-	  if (countUnits(UnitTypes::Protoss_Zealot) > 20) {
+  if (Broodwar->getFrameCount() % 2000) {
+    int zealot_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot);
+	  if (zealot_count > 10) {
       expander();
-	  }
+    }
+  }
+
+  if (Broodwar->getFrameCount() % 8000 == 0) {
+    //this->buildOrderManager->buildAdditional(80,UnitTypes::Protoss_Dragoon,60);
   }
 
   if (Broodwar->getFrameCount() % 3000 == 0) {
-	  if (countUnits(UnitTypes::Protoss_Probe) > 50) {
+    int probe_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Probe);
+    if (probe_count > 50) {
 		  this->workerManager->disableAutoBuild();
 	  }
 	  else {
@@ -132,7 +138,7 @@ void BasicAIModule::onFrame()
 	  }
   }
 
-  if (Broodwar->getFrameCount()>24*50)
+  if (Broodwar->getFrameCount()>24*40)
     scoutManager->setScoutCount(1);
 
   std::set<Unit*> units=Broodwar->self()->getUnits();
