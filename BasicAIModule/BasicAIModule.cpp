@@ -145,7 +145,7 @@ void BasicAIModule::onFrame()
 			  }
 		  }
 	  }
-	  else if ((Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 25 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Dragoon) > 10) || Broodwar->self()->supplyUsed() > 340) {
+	  else if ((Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 25 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Dragoon) > 10) || Broodwar->self()->supplyUsed() > 320) {
       Broodwar->printf("Hep, supply: %d", Broodwar->self()->supplyUsed());
 		  std::set<Unit*> units=Broodwar->self()->getUnits();
 		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
