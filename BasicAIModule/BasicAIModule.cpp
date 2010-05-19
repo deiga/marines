@@ -101,10 +101,9 @@ void BasicAIModule::expander() {
   //Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
   marines_log << Broodwar->getFrameCount() << ": Expand to (" << newbase->getTilePosition().x() << ", " << newbase->getTilePosition().y() << ")!" << endl;
 	this->baseManager->expand(newbase, 50);
-  this->buildManager->build(UnitTypes::Protoss_Pylon, this->buildManager->getBuildingPlacer()->getBuildLocationNear(newbase->getTilePosition(), UnitTypes::Protoss_Pylon));
-  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, this->buildManager->getBuildingPlacer()->getBuildLocationNear(newbase->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
-  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, this->buildManager->getBuildingPlacer()->getBuildLocationNear(newbase->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
-  this->buildManager->build(UnitTypes::Protoss_Gateway, this->buildManager->getBuildingPlacer()->getBuildLocationNear(newbase->getTilePosition(), UnitTypes::Protoss_Gateway));
+  this->buildOrderManager->build(1,UnitTypes::Protoss_Pylon, 80, newbase->getTilePosition());
+  this->buildOrderManager->build(2, UnitTypes::Protoss_Photon_Cannon, 60, newbase->getTilePosition());
+  this->buildOrderManager->build(1, UnitTypes::Protoss_Gateway, 80, newbase->getTilePosition());
 }
 
 void BasicAIModule::onFrame()
@@ -162,12 +161,13 @@ void BasicAIModule::onFrame()
 
   if (Broodwar->getFrameCount() > 0 && (Broodwar->getFrameCount() % 10000 == 0 || Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 30)) {
     marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
-    this->buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Assimilator, 80);
+    this->buildOrderManager->build(2, UnitTypes::Protoss_Assimilator, 80);
     this->upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
     this->upgradeManager->upgrade(UpgradeTypes::Protoss_Armor);
     this->upgradeManager->upgrade(UpgradeTypes::Protoss_Ground_Weapons);
     this->upgradeManager->upgrade(UpgradeTypes::Protoss_Plasma_Shields);
-    this->buildOrderManager->buildAdditional(40,UnitTypes::Protoss_Dragoon,60);
+    this->buildOrderManager->build(40,UnitTypes::Protoss_Dragoon,60);
+    this->buildOrderManager->build(40,UnitTypes::Protoss_Zealot,60);
   }
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0 ) {
