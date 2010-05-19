@@ -15,6 +15,8 @@
 #include <BorderManager.h>
 #include <UnitGroupManager.h>
 #include <EnhancedUI.h>
+#include <fstream>
+
 class BasicAIModule : public BWAPI::AIModule
 {
 public:
@@ -35,6 +37,8 @@ public:
   bool analyzed;
 
   void expander();
+
+  std::fstream marines_log;
 
 
   virtual BWTA::BaseLocation& getNearestExpansion();
