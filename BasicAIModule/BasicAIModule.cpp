@@ -237,17 +237,6 @@ BWTA::BaseLocation& BasicAIModule::getNearestExpansion(){
 	return *distance.second;
 }
 
-int BasicAIModule::countUnits(UnitType type){
-	int count = 0;
-	set<Unit*> units=Broodwar->self()->getUnits(); 
-	for (set<Unit*>::iterator u = units.begin(); u != units.end(); u++) {
-		if ((*u)->getType() == type) {
-			count++;
-		}
-	}
-	return count;
-}
-
 void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
@@ -276,6 +265,9 @@ void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
   if (Broodwar->isReplay()) return;
   this->informationManager->onUnitShow(unit);
   this->unitGroupManager->onUnitShow(unit);
+  if (unit->getType().isBuilding() && unit->getPlayer()->isEnemy(Broodwar->self())) {
+	  enemyBuildings.insert(unit->getPosition());
+  }
 }
 void BasicAIModule::onUnitHide(BWAPI::Unit* unit)
 {

@@ -136,6 +136,34 @@ void BasicAIModule::onFrame()
     this->upgradeManager->upgrade(UpgradeTypes::Protoss_Plasma_Shields);
   }
 
+  if (Broodwar->getFrameCount() % 100 == 0) {
+
+	  if (Broodwar->getFrameCount() < 5000 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 10) {
+		  Broodwar->printf("Hep");
+		  std::set<Unit*> units=Broodwar->self()->getUnits();
+		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
+			  if ((*i)->getType() == UnitTypes::Protoss_Zealot || (*i)->getType() == UnitTypes::Protoss_Dragoon) {
+				  if (!enemyBuildings.empty()){
+				  Broodwar->drawLine(CoordinateType::Map, (*i)->getPosition().x(), (*i)->getPosition().y(), (*enemyBuildings.begin()).x(), (*enemyBuildings.begin()).y(), Colors::Green);
+					  (*i)->attackMove((*enemyBuildings.begin()));
+				  }
+			  }
+		  }
+	  }
+	  else if ((Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 35 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Dragoon) > 10) || Broodwar->self()->supplyUsed() > 340) {
+		  Broodwar->printf("Hep");
+		  std::set<Unit*> units=Broodwar->self()->getUnits();
+		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
+			  if ((*i)->getType() == UnitTypes::Protoss_Zealot || (*i)->getType() == UnitTypes::Protoss_Dragoon) {
+				  if (!enemyBuildings.empty()){
+				  Broodwar->drawLine(CoordinateType::Map, (*i)->getPosition().x(), (*i)->getPosition().y(), (*enemyBuildings.begin()).x(), (*enemyBuildings.begin()).y(), Colors::Green);
+					  (*i)->attackMove((*enemyBuildings.begin()));
+				  }
+			  }
+		  }
+	  }
+  }
+
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 8000 == 0) {
     marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
     this->upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
@@ -232,6 +260,9 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
   this->defenseManager->onRemoveUnit(unit);
   this->informationManager->onUnitDestroy(unit);
   this->baseManager->onRemoveUnit(unit);
+  if (!enemyBuildings.empty()){
+    enemyBuildings.erase(unit->getPosition());
+  }
   if (unit->getType() == UnitTypes::Protoss_Zealot) {
     this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Zealot,55);
   }

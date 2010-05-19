@@ -28,7 +28,6 @@ public:
   virtual void onUnitMorph(BWAPI::Unit* unit);
   virtual void onUnitRenegade(BWAPI::Unit* unit);
   virtual void onUnitDestroy(BWAPI::Unit* unit);
-  virtual int countUnits(BWAPI::UnitType);
   virtual bool onSendText(std::string text);
   ~BasicAIModule(); //not part of BWAPI::AIModule
   void drawStats(); //not part of BWAPI::AIModule
