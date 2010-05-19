@@ -39,6 +39,7 @@ public:
   void expander();
 
   std::fstream marines_log;
+  std::set<BWAPI::Unit*> units;
 
 
   virtual BWTA::BaseLocation& getNearestExpansion();

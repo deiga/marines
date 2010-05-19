@@ -63,7 +63,7 @@ void BasicAIModule::onStart()
   //make the basic production facility
   
   this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Forge, 60);
-  this->buildOrderManager->buildAdditional(120,UnitTypes::Protoss_Zealot,70);
+  this->buildOrderManager->buildAdditional(50,UnitTypes::Protoss_Zealot,70);
   this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Gateway,60);
 
   this->workerManager->enableAutoBuild();
@@ -123,6 +123,7 @@ void BasicAIModule::onFrame()
   drawStats();
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0) {
+    this->buildOrderManager->buildAdditional(20, UnitTypes::Protoss_Zealot, 60);
     int zealot_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot);
     marines_log << Broodwar->getFrameCount() << ": Planning to Expand! " << endl;
     if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
@@ -133,10 +134,10 @@ void BasicAIModule::onFrame()
     this->upgradeManager->upgrade(UpgradeTypes::Protoss_Plasma_Shields);
   }
 
-  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 10000 == 0) {
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 8000 == 0) {
     marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
     this->upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
-    this->buildOrderManager->buildAdditional(80,UnitTypes::Protoss_Dragoon,60);
+    this->buildOrderManager->buildAdditional(60,UnitTypes::Protoss_Dragoon,60);
   }
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0 ) {
@@ -150,11 +151,14 @@ void BasicAIModule::onFrame()
 	  }
   }
 
-  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 1000 == 0)
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 1000 == 0) {
     marines_log << Broodwar->getFrameCount() << ": Sending scout!" << endl;
     scoutManager->setScoutCount(1);
-
-  set<Unit*> units=Broodwar->self()->getUnits();
+  }
+  
+  if (Broodwar->getFrameCount() % 24 == 0) {
+    units = Broodwar->self()->getUnits();
+  }
   if (this->showManagerAssignments)
   {
     for(set<Unit*>::iterator i=units.begin();i!=units.end();i++)
