@@ -126,7 +126,7 @@ void BasicAIModule::onFrame()
   drawStats();
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0) {
-    int zealot_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot);
+    int zealot_count = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot);
     marines_log << Broodwar->getFrameCount() << ": Planning to Expand! " << endl;
     if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
       expander();
@@ -164,10 +164,10 @@ void BasicAIModule::onFrame()
 	  }
   }
 
-  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 8000 == 0) {
+  if (Broodwar->getFrameCount() > 0 && (Broodwar->getFrameCount() % 10000 == 0 || Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 30)) {
     marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
     this->upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
-    this->buildOrderManager->buildAdditional(3, UnitTypes::Protoss_Assimilator, 40);
+    this->buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Assimilator, 40);
     this->buildOrderManager->buildAdditional(40,UnitTypes::Protoss_Dragoon,60);
   }
 
@@ -185,6 +185,7 @@ void BasicAIModule::onFrame()
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 1000 == 0) {
     marines_log << Broodwar->getFrameCount() << ": Sending scout!" << endl;
     scoutManager->setScoutCount(1);
+    scoutManager->update();
   }
   
   if (Broodwar->getFrameCount() % 24 == 0) {
