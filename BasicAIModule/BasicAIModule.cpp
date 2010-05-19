@@ -135,7 +135,7 @@ void BasicAIModule::onFrame()
 
   if (Broodwar->getFrameCount() % 100 == 0) {
 
-	  if (Broodwar->getFrameCount() < 5000 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 10) {
+	  if (Broodwar->getFrameCount() < 5000 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 15) {
       Broodwar->sendText("Attaaack! ...of the killer tomatoes!");
 		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
 			  if ((*i)->getType() == UnitTypes::Protoss_Zealot || (*i)->getType() == UnitTypes::Protoss_Dragoon) {
