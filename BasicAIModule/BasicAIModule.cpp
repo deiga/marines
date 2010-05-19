@@ -60,8 +60,6 @@ void BasicAIModule::onStart()
   this->buildOrderManager->enableDependencyResolver();
   //make the basic production facility
 
-
-  this->buildOrderManager->build(20,workerType,80);
   this->buildOrderManager->buildAdditional(120,UnitTypes::Protoss_Zealot,70);
   this->buildOrderManager->buildAdditional(120,UnitTypes::Protoss_Dragoon,50);
   this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Gateway,60);
@@ -90,6 +88,17 @@ void BasicAIModule::onEnd(bool isWinner)
 {
   log("onEnd(%d)\n",isWinner);
 }
+
+void BasicAIModule::expander() {
+  BWTA::BaseLocation* newbase = &getNearestExpansion();
+  //Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
+	this->baseManager->expand(newbase, 50);
+  this->buildManager->build(UnitTypes::Protoss_Pylon, newbase->getTilePosition());
+  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, newbase->getTilePosition());
+  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, newbase->getTilePosition());
+  this->buildManager->build(UnitTypes::Protoss_Gateway, newbase->getTilePosition());
+}
+
 void BasicAIModule::onFrame()
 {
   if (Broodwar->isReplay()) return;
@@ -106,12 +115,11 @@ void BasicAIModule::onFrame()
   this->borderManager->update();
   this->defenseManager->update();
   this->arbitrator.update();
+  drawStats();
 
   if (Broodwar->getFrameCount() % 3000 == 0) {
 	  if (countUnits(UnitTypes::Protoss_Zealot) > 20) {
-      BWTA::BaseLocation* newbase = &getNearestExpansion();
-		  Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
-		  this->baseManager->expand(newbase, 50);
+      expander();
 	  }
   }
 
@@ -270,4 +278,21 @@ bool BasicAIModule::onSendText(std::string text)
     }
   }
   return true;
+}
+
+void BasicAIModule::drawStats() {
+  std::set<Unit*> myUnits = Broodwar->self()->getUnits();
+  Broodwar->drawTextScreen(5,0,"I have %d units:",myUnits.size());
+  std::map<UnitType, int> unitTypeCounts;
+  for(std::set<Unit*>::iterator i=myUnits.begin();i!=myUnits.end();i++) {
+    if (unitTypeCounts.find((*i)->getType())==unitTypeCounts.end()) {
+      unitTypeCounts.insert(std::make_pair((*i)->getType(),0));
+    }
+    unitTypeCounts.find((*i)->getType())->second++;
+  }
+  int line=1;
+  for(std::map<UnitType,int>::iterator i=unitTypeCounts.begin();i!=unitTypeCounts.end();i++) {
+    Broodwar->drawTextScreen(5,16*line,"- %d %ss",(*i).second, (*i).first.getName().c_str());
+    line++;
+  }
 }

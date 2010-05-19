@@ -29,10 +29,12 @@ public:
   virtual int countUnits(BWAPI::UnitType);
   virtual bool onSendText(std::string text);
   ~BasicAIModule(); //not part of BWAPI::AIModule
-  void showStats(); //not part of BWAPI::AIModule
+  void drawStats(); //not part of BWAPI::AIModule
   void showPlayers();
   void showForces();
   bool analyzed;
+
+  void expander();
 
 
   virtual BWTA::BaseLocation& getNearestExpansion();
