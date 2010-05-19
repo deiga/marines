@@ -66,12 +66,8 @@ void BasicAIModule::onStart()
   this->buildOrderManager->buildAdditional(120,UnitTypes::Protoss_Dragoon,50);
   this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Gateway,60);
 
-
-
-
   this->workerManager->enableAutoBuild();
   this->workerManager->setAutoBuildPriority(40);
-
 }
 
 BasicAIModule::~BasicAIModule()
@@ -111,15 +107,15 @@ void BasicAIModule::onFrame()
   this->defenseManager->update();
   this->arbitrator.update();
 
-  if (Broodwar->getFrameCount() % 3000) {
-	  if (countUnits(UnitTypes::Protoss_Zealot) < 20) {
-		  BWTA::BaseLocation* newbase = BWTA::getNearestBaseLocation(BWTA::getStartLocation(Broodwar->self())->getPosition());
+  if (Broodwar->getFrameCount() % 3000 == 0) {
+	  if (countUnits(UnitTypes::Protoss_Zealot) > 20) {
+      BWTA::BaseLocation* newbase = &getNearestExpansion();
 		  Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
-		  this->baseManager->expand(50);
+		  this->baseManager->expand(newbase, 50);
 	  }
   }
 
-  if (Broodwar->getFrameCount() % 3000) {
+  if (Broodwar->getFrameCount() % 3000 == 0) {
 	  if (countUnits(UnitTypes::Protoss_Probe) > 50) {
 		  this->workerManager->disableAutoBuild();
 	  }
