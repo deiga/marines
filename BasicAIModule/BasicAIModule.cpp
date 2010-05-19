@@ -122,25 +122,30 @@ void BasicAIModule::onFrame()
   this->arbitrator.update();
   drawStats();
 
-  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000) {
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0) {
     int zealot_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot);
-	  if (zealot_count > 10) {
+    marines_log << Broodwar->getFrameCount() << ": Planning to Expand! " << endl;
+    if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
       expander();
     }
+    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Armor);
+    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Ground_Weapons);
+    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Plasma_Shields);
   }
 
-  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 8000 == 0) {
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 10000 == 0) {
     marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
-    //this->buildOrderManager->buildAdditional(80,UnitTypes::Protoss_Dragoon,60);
+    this->buildOrderManager->buildAdditional(80,UnitTypes::Protoss_Dragoon,60);
   }
 
-  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 3000 == 0 ) {
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0 ) {
     int probe_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Probe);
-    if (probe_count > 50) {
+    if (probe_count >= 40) {
 		  this->workerManager->disableAutoBuild();
 	  }
-	  else {
+	  else if (probe_count < 35) {
 		  this->workerManager->enableAutoBuild();
+      this->workerManager->setAutoBuildPriority(40);
 	  }
   }
 
