@@ -147,7 +147,7 @@ void BasicAIModule::onFrame()
 		  }
 	  }
 	  else if ((Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 25 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Dragoon) > 10) || Broodwar->self()->supplyUsed() > 340) {
-      Broodwar->printf("Hep"+Broodwar->self()->supplyUsed());
+      Broodwar->printf("Hep, supply: %d", Broodwar->self()->supplyUsed());
 		  std::set<Unit*> units=Broodwar->self()->getUnits();
 		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
 			  if ((*i)->getType() == UnitTypes::Protoss_Zealot || (*i)->getType() == UnitTypes::Protoss_Dragoon) {
@@ -162,11 +162,11 @@ void BasicAIModule::onFrame()
 
   if (Broodwar->getFrameCount() > 0 && (Broodwar->getFrameCount() % 10000 == 0 || Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 30)) {
     marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
+    this->buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Assimilator, 80);
     this->upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
     this->upgradeManager->upgrade(UpgradeTypes::Protoss_Armor);
     this->upgradeManager->upgrade(UpgradeTypes::Protoss_Ground_Weapons);
     this->upgradeManager->upgrade(UpgradeTypes::Protoss_Plasma_Shields);
-    this->buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Assimilator, 40);
     this->buildOrderManager->buildAdditional(40,UnitTypes::Protoss_Dragoon,60);
   }
 
