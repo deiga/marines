@@ -1,14 +1,17 @@
 #include "BasicAIModule.h"
 #include "Util.h"
 using namespace BWAPI;
+using namespace std;
 
 void BasicAIModule::onStart()
 {
+  marines_log.open("marines.log", fstream::out);
   this->showManagerAssignments=false;
   if (Broodwar->isReplay()) return;
   // Enable some cheat flags
   Broodwar->enableFlag(Flag::UserInput);
   //Broodwar->enableFlag(Flag::CompleteMapInformation);
+  Broodwar->setLocalSpeed(25);
   BWTA::readMap();
   BWTA::analyze();
   this->analyzed=true;
@@ -43,7 +46,7 @@ void BasicAIModule::onStart()
   double minDist;
   BWTA::BaseLocation* natural=NULL;
   BWTA::BaseLocation* home=BWTA::getStartLocation(Broodwar->self());
-  for(std::set<BWTA::BaseLocation*>::const_iterator b=BWTA::getBaseLocations().begin();b!=BWTA::getBaseLocations().end();b++)
+  for(set<BWTA::BaseLocation*>::const_iterator b=BWTA::getBaseLocations().begin();b!=BWTA::getBaseLocations().end();b++)
   {
     if (*b==home) continue;
     double dist=home->getGroundDistance(*b);
@@ -58,81 +61,15 @@ void BasicAIModule::onStart()
   }
   this->buildOrderManager->enableDependencyResolver();
   //make the basic production facility
-  if (race == Races::Zerg)
-  {
-    //send an overlord out if Zerg
-    this->scoutManager->setScoutCount(1);
+  
+  this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Forge, 60);
+  this->buildOrderManager->buildAdditional(45,UnitTypes::Protoss_Zealot,70);
+  this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Gateway,60);
 
-    //9 pool
-    /*
-    this->buildOrderManager->build(9,workerType,80);
-    this->buildOrderManager->buildAdditional(3,UnitTypes::Zerg_Zergling,82);
-    this->buildOrderManager->buildAdditional(1,UnitTypes::Zerg_Spawning_Pool,79);
-    this->buildOrderManager->build(40,workerType,78);
-    */
-    //12 hatch
-    this->buildOrderManager->build(9,UnitTypes::Zerg_Drone,82);
-    this->buildOrderManager->build(2,UnitTypes::Zerg_Overlord,81);
-    this->buildOrderManager->build(12,UnitTypes::Zerg_Drone,80);
-    this->baseManager->expand(natural,79);
-    this->buildOrderManager->build(1,UnitTypes::Zerg_Extractor,78);
-    this->buildOrderManager->build(20,UnitTypes::Zerg_Drone,77);
-    this->buildOrderManager->build(60,UnitTypes::Zerg_Drone,75);
-    this->buildOrderManager->build(1,UnitTypes::Zerg_Spawning_Pool,60);
-    this->buildOrderManager->build(3,UnitTypes::Zerg_Zergling,82);
-    this->buildOrderManager->build(1,UnitTypes::Zerg_Lair,55);
-    this->buildOrderManager->buildAdditional(1,UnitTypes::Zerg_Hatchery,50);
-    this->buildOrderManager->build(1,UnitTypes::Zerg_Spire,45);
-    this->buildOrderManager->build(9,UnitTypes::Zerg_Mutalisk,120);
-  }
-  else if (race == Races::Terran)
-  {
-    this->buildOrderManager->build(20,workerType,80);
-    if (enemyRace == Races::Zerg)
-    {
-      this->buildOrderManager->buildAdditional(1,UnitTypes::Terran_Barracks,60);
-      this->buildOrderManager->buildAdditional(9,UnitTypes::Terran_Marine,45);
-      this->buildOrderManager->buildAdditional(1,UnitTypes::Terran_Refinery,42);
-      this->buildOrderManager->buildAdditional(1,UnitTypes::Terran_Barracks,40);
-      this->buildOrderManager->buildAdditional(1,UnitTypes::Terran_Academy,39);
-      this->buildOrderManager->buildAdditional(9,UnitTypes::Terran_Medic,38);
-      this->buildOrderManager->research(TechTypes::Stim_Packs,35);
-      this->buildOrderManager->research(TechTypes::Tank_Siege_Mode,35);
-      this->buildOrderManager->buildAdditional(3,UnitTypes::Terran_Siege_Tank_Tank_Mode,34);
-      this->buildOrderManager->buildAdditional(2,UnitTypes::Terran_Science_Vessel,30);
-      this->buildOrderManager->research(TechTypes::Irradiate,30);
-      this->buildOrderManager->upgrade(1,UpgradeTypes::Terran_Infantry_Weapons,20);
-      this->buildOrderManager->build(3,UnitTypes::Terran_Missile_Turret,13);
-      this->buildOrderManager->upgrade(3,UpgradeTypes::Terran_Infantry_Weapons,12);
-      this->buildOrderManager->upgrade(3,UpgradeTypes::Terran_Infantry_Armor,12);
-      this->buildOrderManager->build(1,UnitTypes::Terran_Engineering_Bay,11);
-      this->buildOrderManager->buildAdditional(40,UnitTypes::Terran_Marine,10);
-      this->buildOrderManager->build(6,UnitTypes::Terran_Barracks,8);
-      this->buildOrderManager->build(2,UnitTypes::Terran_Engineering_Bay,7);
-      this->buildOrderManager->buildAdditional(10,UnitTypes::Terran_Siege_Tank_Tank_Mode,5);
-    }
-    else
-    {
-      this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Terran_Machine_Shop,70);
-      this->buildOrderManager->buildAdditional(3,BWAPI::UnitTypes::Terran_Factory,60);
-      this->buildOrderManager->research(TechTypes::Spider_Mines,55);
-      this->buildOrderManager->research(TechTypes::Tank_Siege_Mode,55);
-      this->buildOrderManager->buildAdditional(20,BWAPI::UnitTypes::Terran_Vulture,40);
-      this->buildOrderManager->buildAdditional(20,BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode,40);
-      this->buildOrderManager->upgrade(3,UpgradeTypes::Terran_Vehicle_Weapons,20);
-    }
-  }
-  else if (race == Races::Protoss)
-  {
-    this->buildOrderManager->build(20,workerType,80);
-    this->buildOrderManager->buildAdditional(10,UnitTypes::Protoss_Dragoon,70);
-    this->buildOrderManager->buildAdditional(10,UnitTypes::Protoss_Zealot,70);
-    this->buildOrderManager->upgrade(1,UpgradeTypes::Singularity_Charge,61);
-    this->buildOrderManager->buildAdditional(20,UnitTypes::Protoss_Carrier,60);
-  }
   this->workerManager->enableAutoBuild();
-  this->workerManager->setAutoBuildPriority(40);
+  this->workerManager->setAutoBuildPriority(90);
 
+  marines_log << "onStart() done!" << endl;
 }
 
 BasicAIModule::~BasicAIModule()
@@ -155,6 +92,21 @@ void BasicAIModule::onEnd(bool isWinner)
 {
   log("onEnd(%d)\n",isWinner);
 }
+
+void BasicAIModule::expander() {
+  BWTA::BaseLocation* newbase = &getNearestExpansion();
+  if (newbase == NULL) {
+    return;
+  }
+  //Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
+  marines_log << Broodwar->getFrameCount() << ": Expand to (" << newbase->getTilePosition().x() << ", " << newbase->getTilePosition().y() << ")!" << endl;
+	this->baseManager->expand(newbase, 50);
+  this->buildManager->build(UnitTypes::Protoss_Pylon, newbase->getTilePosition());
+  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, newbase->getTilePosition());
+  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, newbase->getTilePosition());
+  this->buildManager->build(UnitTypes::Protoss_Gateway, newbase->getTilePosition());
+}
+
 void BasicAIModule::onFrame()
 {
   if (Broodwar->isReplay()) return;
@@ -171,25 +123,59 @@ void BasicAIModule::onFrame()
   this->borderManager->update();
   this->defenseManager->update();
   this->arbitrator.update();
+  drawStats();
 
-  if (Broodwar->getFrameCount()>24*50)
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0) {
+    int zealot_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot);
+    marines_log << Broodwar->getFrameCount() << ": Planning to Expand! " << endl;
+    if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
+      expander();
+    }
+    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Armor);
+    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Ground_Weapons);
+    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Plasma_Shields);
+  }
+
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 8000 == 0) {
+    marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
+    this->upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
+    this->buildOrderManager->buildAdditional(3, UnitTypes::Protoss_Assimilator, 40);
+    this->buildOrderManager->buildAdditional(40,UnitTypes::Protoss_Dragoon,60);
+  }
+
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0 ) {
+    int probe_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Probe);
+    if (probe_count >= 40) {
+		  this->workerManager->disableAutoBuild();
+	  }
+	  else if (probe_count < 35) {
+		  this->workerManager->enableAutoBuild();
+      this->workerManager->setAutoBuildPriority(40);
+	  }
+  }
+
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 1000 == 0) {
+    marines_log << Broodwar->getFrameCount() << ": Sending scout!" << endl;
     scoutManager->setScoutCount(1);
-
-  std::set<Unit*> units=Broodwar->self()->getUnits();
+  }
+  
+  if (Broodwar->getFrameCount() % 24 == 0) {
+    units = Broodwar->self()->getUnits();
+  }
   if (this->showManagerAssignments)
   {
-    for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
+    for(set<Unit*>::iterator i=units.begin();i!=units.end();i++)
     {
       if (this->arbitrator.hasBid(*i))
       {
         int x=(*i)->getPosition().x();
         int y=(*i)->getPosition().y();
-        std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> > bids=this->arbitrator.getAllBidders(*i);
+        list< pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> > bids=this->arbitrator.getAllBidders(*i);
         int y_off=0;
         bool first = false;
         const char activeColor = '\x07', inactiveColor = '\x16';
         char color = activeColor;
-        for(std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> >::iterator j=bids.begin();j!=bids.end();j++)
+        for(list< pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> >::iterator j=bids.begin();j!=bids.end();j++)
         {
           Broodwar->drawTextMap(x,y+y_off,"%c%s: %d",color,j->first->getShortName().c_str(),(int)j->second);
           y_off+=15;
@@ -199,11 +185,39 @@ void BasicAIModule::onFrame()
     }
   }
 
+  
+
   UnitGroup myPylonsAndGateways = SelectAll()(Pylon,Gateway)(HitPoints,"<=",200);
   for each(Unit* u in myPylonsAndGateways)
   {
     Broodwar->drawCircleMap(u->getPosition().x(),u->getPosition().y(),20,Colors::Red);
   }
+}
+
+BWTA::BaseLocation& BasicAIModule::getNearestExpansion(){
+  marines_log << Broodwar->getFrameCount() << ": getNearestExpansion()" << endl;
+	set<BWTA::BaseLocation*> pesat = BWTA::getBaseLocations();
+	pair<double, BWTA::BaseLocation*> distance = pair<double, BWTA::BaseLocation*>(99999.0, NULL);
+	for(set<BWTA::BaseLocation*>::const_iterator b = pesat.begin(); b != pesat.end(); b++){
+		if (this->baseManager->getBase((*b)) == NULL) {
+			double temp_dist = (*b)->getGroundDistance(BWTA::getStartLocation(Broodwar->self()));
+			if((temp_dist) < distance.first) {
+				distance = pair<double, BWTA::BaseLocation*>(temp_dist, (*b));
+			}
+		}
+	}
+	return *distance.second;
+}
+
+int BasicAIModule::countUnits(UnitType type){
+	int count = 0;
+	set<Unit*> units=Broodwar->self()->getUnits(); 
+	for (set<Unit*>::iterator u = units.begin(); u != units.end(); u++) {
+		if ((*u)->getType() == type) {
+			count++;
+		}
+	}
+	return count;
 }
 
 void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
@@ -218,6 +232,12 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
   this->defenseManager->onRemoveUnit(unit);
   this->informationManager->onUnitDestroy(unit);
   this->baseManager->onRemoveUnit(unit);
+  if (unit->getType() == UnitTypes::Protoss_Zealot) {
+    this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Zealot,55);
+  }
+  else if (unit->getType() == UnitTypes::Protoss_Dragoon) {
+    this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Dragoon,40);
+  }
 }
 
 void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
@@ -244,7 +264,7 @@ void BasicAIModule::onUnitRenegade(BWAPI::Unit* unit)
   this->unitGroupManager->onUnitRenegade(unit);
 }
 
-bool BasicAIModule::onSendText(std::string text)
+bool BasicAIModule::onSendText(string text)
 {
   if (Broodwar->isReplay()) return true;
   UnitType type=UnitTypes::getUnitType(text);
@@ -291,4 +311,21 @@ bool BasicAIModule::onSendText(std::string text)
     }
   }
   return true;
+}
+
+void BasicAIModule::drawStats() {
+  set<Unit*> myUnits = Broodwar->self()->getUnits();
+  Broodwar->drawTextScreen(5,0,"I have %d units:",myUnits.size());
+  map<UnitType, int> unitTypeCounts;
+  for(set<Unit*>::iterator i=myUnits.begin();i!=myUnits.end();i++) {
+    if (unitTypeCounts.find((*i)->getType())==unitTypeCounts.end()) {
+      unitTypeCounts.insert(make_pair((*i)->getType(),0));
+    }
+    unitTypeCounts.find((*i)->getType())->second++;
+  }
+  int line=1;
+  for(map<UnitType,int>::iterator i=unitTypeCounts.begin();i!=unitTypeCounts.end();i++) {
+    Broodwar->drawTextScreen(5,16*line,"- %d %ss",(*i).second, (*i).first.getName().c_str());
+    line++;
+  }
 }

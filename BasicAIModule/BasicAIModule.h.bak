@@ -15,6 +15,8 @@
 #include <BorderManager.h>
 #include <UnitGroupManager.h>
 #include <EnhancedUI.h>
+#include <fstream>
+
 class BasicAIModule : public BWAPI::AIModule
 {
 public:
@@ -26,12 +28,21 @@ public:
   virtual void onUnitMorph(BWAPI::Unit* unit);
   virtual void onUnitRenegade(BWAPI::Unit* unit);
   virtual void onUnitDestroy(BWAPI::Unit* unit);
+  virtual int countUnits(BWAPI::UnitType);
   virtual bool onSendText(std::string text);
   ~BasicAIModule(); //not part of BWAPI::AIModule
-  void showStats(); //not part of BWAPI::AIModule
+  void drawStats(); //not part of BWAPI::AIModule
   void showPlayers();
   void showForces();
   bool analyzed;
+
+  void expander();
+
+  std::fstream marines_log;
+  std::set<BWAPI::Unit*> units;
+
+
+  virtual BWTA::BaseLocation& getNearestExpansion();
   std::map<BWAPI::Unit*,BWAPI::UnitType> buildings;
   Arbitrator::Arbitrator<BWAPI::Unit*,double> arbitrator;
   WorkerManager* workerManager;

@@ -41,7 +41,7 @@ public:
   std::fstream marines_log;
   std::set<BWAPI::Unit*> units;
 
-
+  std::set<BWAPI::Position> enemyBuildings;
   virtual BWTA::BaseLocation& getNearestExpansion();
   std::map<BWAPI::Unit*,BWAPI::UnitType> buildings;
   Arbitrator::Arbitrator<BWAPI::Unit*,double> arbitrator;
