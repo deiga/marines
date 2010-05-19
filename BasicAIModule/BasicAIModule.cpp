@@ -139,7 +139,8 @@ void BasicAIModule::onFrame()
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 8000 == 0) {
     marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
     this->upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
-    this->buildOrderManager->buildAdditional(60,UnitTypes::Protoss_Dragoon,60);
+    this->buildOrderManager->buildAdditional(3, UnitTypes::Protoss_Assimilator, 40);
+    this->buildOrderManager->buildAdditional(40,UnitTypes::Protoss_Dragoon,60);
   }
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0 ) {
@@ -232,10 +233,10 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
   this->informationManager->onUnitDestroy(unit);
   this->baseManager->onRemoveUnit(unit);
   if (unit->getType() == UnitTypes::Protoss_Zealot) {
-    this->buildOrderManager->buildAdditional(5,UnitTypes::Protoss_Zealot,45);
+    this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Zealot,55);
   }
   else if (unit->getType() == UnitTypes::Protoss_Dragoon) {
-    this->buildOrderManager->buildAdditional(3,UnitTypes::Protoss_Dragoon,50);
+    this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Dragoon,40);
   }
 }
 
