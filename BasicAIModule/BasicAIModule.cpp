@@ -101,10 +101,10 @@ void BasicAIModule::expander() {
   //Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
   marines_log << Broodwar->getFrameCount() << ": Expand to (" << newbase->getTilePosition().x() << ", " << newbase->getTilePosition().y() << ")!" << endl;
 	this->baseManager->expand(newbase, 50);
-  this->buildManager->build(UnitTypes::Protoss_Pylon, newbase->getTilePosition());
-  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, newbase->getTilePosition());
-  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, newbase->getTilePosition());
-  this->buildManager->build(UnitTypes::Protoss_Gateway, newbase->getTilePosition());
+  this->buildManager->build(UnitTypes::Protoss_Pylon, this->buildManager->getBuildingPlacer()->getBuildLocationNear(newbase->getTilePosition(), UnitTypes::Protoss_Pylon));
+  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, this->buildManager->getBuildingPlacer()->getBuildLocationNear(newbase->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
+  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, this->buildManager->getBuildingPlacer()->getBuildLocationNear(newbase->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
+  this->buildManager->build(UnitTypes::Protoss_Gateway, this->buildManager->getBuildingPlacer()->getBuildLocationNear(newbase->getTilePosition(), UnitTypes::Protoss_Gateway));
 }
 
 void BasicAIModule::onFrame()
