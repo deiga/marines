@@ -135,6 +135,7 @@ void BasicAIModule::onFrame()
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 10000 == 0) {
     marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
+    this->upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
     this->buildOrderManager->buildAdditional(80,UnitTypes::Protoss_Dragoon,60);
   }
 
