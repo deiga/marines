@@ -9,8 +9,8 @@ void BasicAIModule::onStart()
   this->showManagerAssignments=false;
   if (Broodwar->isReplay()) return;
   // Enable some cheat flags
-  Broodwar->enableFlag(Flag::UserInput);
-  //Broodwar->enableFlag(Flag::CompleteMapInformation);
+  // Broodwar->enableFlag(Flag::UserInput);
+  // Broodwar->enableFlag(Flag::CompleteMapInformation);
   Broodwar->setLocalSpeed(15);
   BWTA::readMap();
   BWTA::analyze();
@@ -136,7 +136,7 @@ void BasicAIModule::onFrame()
 
     int zealot_count = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot);
     marines_log << Broodwar->getFrameCount() << ": Planning to Expand! " << endl;
-	  if (zealot_count > 10 && Broodwar->self()->minerals() >= 200 && expcounter == 0) {
+	  if (zealot_count > 10 && Broodwar->self()->minerals() >= 500 && expcounter == 0) {
 		  Broodwar->printf("Pylonia tekee");
       marines_log << Broodwar->getFrameCount() << ": Pylonia tekee " << endl;
 		  BWTA::BaseLocation* newbase = &getNearestExpansion();
@@ -144,7 +144,7 @@ void BasicAIModule::onFrame()
       this->baseManager->expand(newbase);
 		  this->borderManager->addMyBase(newbase);
 		  expcounter++;
-	  } else if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
+	  } else if (zealot_count > 10 && Broodwar->self()->minerals() >= 400) {
       marines_log << Broodwar->getFrameCount() << ": Puuhataan base " << endl;
 		  Broodwar->printf("Nyt puuhataan base");
       expander();
@@ -428,7 +428,7 @@ Unit* BasicAIModule::getClosestUnit(Unit* unit) {
 void BasicAIModule::allUnitsAttackClosest() {
   UnitGroup own_units = SelectAll();
   for(UnitGroup::const_iterator it = own_units.begin(); it != own_units.end(); it++) {
-    if (!sightedEnemies.empty() && !(*it)->getType().isWorker()) {
+    if (!sightedEnemies.empty() && !(*it)->getType().isWorker() && !(*it)->getType().isBuilding()) {
       Unit* target = getClosestUnit((*it));
       Unit* own = (*it);
       own->attackUnit(target);
