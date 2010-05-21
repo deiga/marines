@@ -40,6 +40,7 @@ void BasicAIModule::onStart()
   this->baseManager->setBorderManager(this->borderManager);
   this->defenseManager->setBorderManager(this->borderManager);
   
+  this->scoutManager->setDebugMode(true);
   BWAPI::Race race = Broodwar->self()->getRace();
   BWAPI::Race enemyRace = Broodwar->enemy()->getRace();
   BWAPI::UnitType workerType=*(race.getWorker());
@@ -101,10 +102,8 @@ void BasicAIModule::expander() {
   //Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
   marines_log << Broodwar->getFrameCount() << ": Expand to (" << newbase->getTilePosition().x() << ", " << newbase->getTilePosition().y() << ")!" << endl;
 	this->baseManager->expand(newbase, 50);
-  this->buildManager->build(UnitTypes::Protoss_Pylon, newbase->getTilePosition());
-  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, newbase->getTilePosition());
-  this->buildManager->build(UnitTypes::Protoss_Photon_Cannon, newbase->getTilePosition());
-  this->buildManager->build(UnitTypes::Protoss_Gateway, newbase->getTilePosition());
+  this->buildOrderManager->build(1,UnitTypes::Protoss_Pylon, 75, newbase->getTilePosition());
+  this->buildOrderManager->build(1, UnitTypes::Protoss_Gateway, 85, newbase->getTilePosition());
 }
 
 void BasicAIModule::onFrame()
@@ -126,21 +125,17 @@ void BasicAIModule::onFrame()
   drawStats();
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0) {
-    int zealot_count = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot);
+    int zealot_count = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot);
     marines_log << Broodwar->getFrameCount() << ": Planning to Expand! " << endl;
     if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
       expander();
     }
-    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Armor);
-    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Ground_Weapons);
-    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Plasma_Shields);
   }
 
   if (Broodwar->getFrameCount() % 100 == 0) {
 
-	  if (Broodwar->getFrameCount() < 5000 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 10) {
-		  Broodwar->printf("Hep");
-		  std::set<Unit*> units=Broodwar->self()->getUnits();
+	  if (Broodwar->getFrameCount() < 5000 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 15) {
+      Broodwar->sendText("Attaaack! ...of the killer tomatoes!");
 		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
 			  if ((*i)->getType() == UnitTypes::Protoss_Zealot || (*i)->getType() == UnitTypes::Protoss_Dragoon) {
 				  if (!enemyBuildings.empty()){
@@ -150,8 +145,8 @@ void BasicAIModule::onFrame()
 			  }
 		  }
 	  }
-	  else if ((Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 35 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Dragoon) > 10) || Broodwar->self()->supplyUsed() > 340) {
-		  Broodwar->printf("Hep");
+	  else if ((Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 25 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Dragoon) > 10) || Broodwar->self()->supplyUsed() > 320) {
+      Broodwar->printf("Hep, supply: %d", Broodwar->self()->supplyUsed());
 		  std::set<Unit*> units=Broodwar->self()->getUnits();
 		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
 			  if ((*i)->getType() == UnitTypes::Protoss_Zealot || (*i)->getType() == UnitTypes::Protoss_Dragoon) {
@@ -164,11 +159,15 @@ void BasicAIModule::onFrame()
 	  }
   }
 
-  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 8000 == 0) {
+  if (Broodwar->getFrameCount() > 0 && (Broodwar->getFrameCount() % 10000 == 0 || Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 30)) {
     marines_log << Broodwar->getFrameCount() << ": Dragoon queue! " << endl;
+    this->buildOrderManager->build(2, UnitTypes::Protoss_Assimilator, 80);
     this->upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
-    this->buildOrderManager->buildAdditional(3, UnitTypes::Protoss_Assimilator, 40);
-    this->buildOrderManager->buildAdditional(40,UnitTypes::Protoss_Dragoon,60);
+    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Armor);
+    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Ground_Weapons);
+    this->upgradeManager->upgrade(UpgradeTypes::Protoss_Plasma_Shields);
+    this->buildOrderManager->build(40,UnitTypes::Protoss_Dragoon,60);
+    this->buildOrderManager->build(40,UnitTypes::Protoss_Zealot,60);
   }
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0 ) {
@@ -184,7 +183,13 @@ void BasicAIModule::onFrame()
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 1000 == 0) {
     marines_log << Broodwar->getFrameCount() << ": Sending scout!" << endl;
-    scoutManager->setScoutCount(1);
+    if (scoutManager->isScouting()) {
+      if (this->scoutManager->scouts.begin()->second.mode == ScoutManager::ScoutData::Idle) {
+        this->scoutManager->setScoutCount(0);
+      }
+    } else {
+      this->scoutManager->setScoutCount(1);
+    }
   }
   
   if (Broodwar->getFrameCount() % 24 == 0) {
@@ -237,17 +242,6 @@ BWTA::BaseLocation& BasicAIModule::getNearestExpansion(){
 	return *distance.second;
 }
 
-int BasicAIModule::countUnits(UnitType type){
-	int count = 0;
-	set<Unit*> units=Broodwar->self()->getUnits(); 
-	for (set<Unit*>::iterator u = units.begin(); u != units.end(); u++) {
-		if ((*u)->getType() == type) {
-			count++;
-		}
-	}
-	return count;
-}
-
 void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
@@ -271,11 +265,32 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
   }
 }
 
+void BasicAIModule::onUnitCreate(Unit* unit) {
+  if (!Broodwar->isReplay()) {
+    if (unit->getType() == UnitTypes::Protoss_Nexus) {
+      this->buildOrderManager->build(2, UnitTypes::Protoss_Photon_Cannon, 60, TilePosition(unit->getPosition()));
+    }
+  } else {
+    /*if we are in a replay, then we will print out the build order
+    (just of the buildings, not the units).*/
+    if (unit->getType().isBuilding() && unit->getPlayer()->isNeutral()==false) {
+      int seconds=Broodwar->getFrameCount()/24;
+      int minutes=seconds/60;
+      seconds%=60;
+      Broodwar->sendText("%.2d:%.2d: %s creates a %s",minutes,seconds,unit->getPlayer()->getName().c_str(),unit->getType().getName().c_str());
+    }
+  }
+}
+
+
 void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
   this->informationManager->onUnitShow(unit);
   this->unitGroupManager->onUnitShow(unit);
+  if (unit->getType().isBuilding() && unit->getPlayer()->isEnemy(Broodwar->self())) {
+	  enemyBuildings.insert(unit->getPosition());
+  }
 }
 void BasicAIModule::onUnitHide(BWAPI::Unit* unit)
 {

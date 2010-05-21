@@ -11,9 +11,10 @@ void BasicAIModule::onStart()
   // Enable some cheat flags
   Broodwar->enableFlag(Flag::UserInput);
   //Broodwar->enableFlag(Flag::CompleteMapInformation);
-  Broodwar->setLocalSpeed(25);
+  Broodwar->setLocalSpeed(15);
   BWTA::readMap();
   BWTA::analyze();
+  expcounter = 0;
   this->analyzed=true;
   this->buildManager       = new BuildManager(&this->arbitrator);
   this->techManager        = new TechManager(&this->arbitrator);
@@ -40,6 +41,7 @@ void BasicAIModule::onStart()
   this->baseManager->setBorderManager(this->borderManager);
   this->defenseManager->setBorderManager(this->borderManager);
   
+  this->scoutManager->setDebugMode(true);
   BWAPI::Race race = Broodwar->self()->getRace();
   BWAPI::Race enemyRace = Broodwar->enemy()->getRace();
   BWAPI::UnitType workerType=*(race.getWorker());
@@ -64,7 +66,8 @@ void BasicAIModule::onStart()
   
   this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Forge, 60);
   this->buildOrderManager->buildAdditional(45,UnitTypes::Protoss_Zealot,70);
-  this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Gateway,60);
+  this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,60);
+  this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Gateway,40);
 
   this->workerManager->enableAutoBuild();
   this->workerManager->setAutoBuildPriority(90);
@@ -100,10 +103,9 @@ void BasicAIModule::expander() {
   }
   //Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
   marines_log << Broodwar->getFrameCount() << ": Expand to (" << newbase->getTilePosition().x() << ", " << newbase->getTilePosition().y() << ")!" << endl;
-	this->baseManager->expand(newbase, 50);
-  this->buildOrderManager->build(1,UnitTypes::Protoss_Pylon, 80, newbase->getTilePosition());
-  this->buildOrderManager->build(2, UnitTypes::Protoss_Photon_Cannon, 60, newbase->getTilePosition());
-  this->buildOrderManager->build(1, UnitTypes::Protoss_Gateway, 80, newbase->getTilePosition());
+  this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Nexus, 100, newbase->getTilePosition());
+  this->buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Photon_Cannon, 60, newbase->getTilePosition());
+  this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Gateway, 80, newbase->getTilePosition());
 }
 
 void BasicAIModule::onFrame()
@@ -123,12 +125,27 @@ void BasicAIModule::onFrame()
   this->defenseManager->update();
   this->arbitrator.update();
   drawStats();
+ // Ala: 2016, 3744 Yla: 2342, 500
+  if (Broodwar->getFrameCount() == 10) {
+	  Broodwar->printf("X: %d, Y: %d",  Broodwar->self()->getStartLocation().x()*32, Broodwar->self()->getStartLocation().y()*32);
+	  Broodwar->printf("Pylon buildtime: %d", BWAPI::UnitTypes::Protoss_Pylon.buildTime());
+  }
 
-  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 2000 == 0) {
+  if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 600 == 0) {
+
     int zealot_count = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot);
     marines_log << Broodwar->getFrameCount() << ": Planning to Expand! " << endl;
-    if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
+	if (zealot_count > 10 && Broodwar->self()->minerals() >= 200 && expcounter == 0) {
+		Broodwar->printf("Pylonia tekee");
+		BWTA::BaseLocation* newbase = &getNearestExpansion();
+		this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Pylon, 100, BWAPI::TilePosition(newbase->getTilePosition().x()-3, newbase->getTilePosition().y()-2));
+		this->borderManager->addMyBase(newbase);
+		expcounter++;
+	}
+    else if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
+		Broodwar->printf("Nyt puuhataan base");
       expander();
+		expcounter = 0;
     }
   }
 
@@ -183,8 +200,13 @@ void BasicAIModule::onFrame()
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 1000 == 0) {
     marines_log << Broodwar->getFrameCount() << ": Sending scout!" << endl;
-    scoutManager->setScoutCount(1);
-    scoutManager->update();
+    if (scoutManager->isScouting()) {
+      if (this->scoutManager->scouts.begin()->second.mode == ScoutManager::ScoutData::Idle) {
+        this->scoutManager->setScoutCount(0);
+      }
+    } else {
+      this->scoutManager->setScoutCount(1);
+    }
   }
   
   if (Broodwar->getFrameCount() % 24 == 0) {
@@ -227,7 +249,18 @@ BWTA::BaseLocation& BasicAIModule::getNearestExpansion(){
 	set<BWTA::BaseLocation*> pesat = BWTA::getBaseLocations();
 	pair<double, BWTA::BaseLocation*> distance = pair<double, BWTA::BaseLocation*>(99999.0, NULL);
 	for(set<BWTA::BaseLocation*>::const_iterator b = pesat.begin(); b != pesat.end(); b++){
-		if (this->baseManager->getBase((*b)) == NULL) {
+		bool nexusfound = 0;
+		UnitGroup basshunter = AllUnits();
+		UnitGroup nex = basshunter.inRegion((*b)->getRegion());
+		if (!nex.empty()) {
+			for(set<BWAPI::Unit*>::const_iterator d = nex.begin(); d != nex.end(); d++) {		
+				if ((*d)->getType() == BWAPI::UnitTypes::Protoss_Nexus) {
+					nexusfound = 1;
+				}
+			}
+		}
+
+		if (this->baseManager->getBase((*b)) == NULL && nexusfound == 0) {
 			double temp_dist = (*b)->getGroundDistance(BWTA::getStartLocation(Broodwar->self()));
 			if((temp_dist) < distance.first) {
 				distance = pair<double, BWTA::BaseLocation*>(temp_dist, (*b));
@@ -260,6 +293,22 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
   }
 }
 
+void BasicAIModule::onUnitCreate(Unit* unit) {
+  if (!Broodwar->isReplay()) {
+ 
+  } else {
+    /*if we are in a replay, then we will print out the build order
+    (just of the buildings, not the units).*/
+    if (unit->getType().isBuilding() && unit->getPlayer()->isNeutral()==false) {
+      int seconds=Broodwar->getFrameCount()/24;
+      int minutes=seconds/60;
+      seconds%=60;
+      Broodwar->sendText("%.2d:%.2d: %s creates a %s",minutes,seconds,unit->getPlayer()->getName().c_str(),unit->getType().getName().c_str());
+    }
+  }
+}
+
+
 void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
@@ -267,6 +316,7 @@ void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
   this->unitGroupManager->onUnitShow(unit);
   if (unit->getType().isBuilding() && unit->getPlayer()->isEnemy(Broodwar->self())) {
 	  enemyBuildings.insert(unit->getPosition());
+	  Broodwar->printf("Enemy building: X: %d, Y: %d", unit->getPosition().x(), unit->getPosition().y());
   }
 }
 void BasicAIModule::onUnitHide(BWAPI::Unit* unit)
