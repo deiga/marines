@@ -133,7 +133,7 @@ void BasicAIModule::onFrame()
  // Ala: 2016, 3744 Yla: 2342, 500
   if (Broodwar->getFrameCount() == 10) {
 	  Broodwar->printf("X: %d, Y: %d",  Broodwar->self()->getStartLocation().x()*32, Broodwar->self()->getStartLocation().y()*32);
-	  Broodwar->printf("Pylon buildtime: %d", BWAPI::UnitTypes::Protoss_Pylon.buildTime());
+	  //Broodwar->printf("Pylon buildtime: %d", BWAPI::UnitTypes::Protoss_Pylon.buildTime());
   }
 
   if (Broodwar->getFrameCount() > 0 && Broodwar->getFrameCount() % 600 == 0) {
@@ -264,18 +264,7 @@ BWTA::BaseLocation& BasicAIModule::getNearestExpansion(){
 	set<BWTA::BaseLocation*> pesat = BWTA::getBaseLocations();
 	pair<double, BWTA::BaseLocation*> distance = pair<double, BWTA::BaseLocation*>(99999.0, NULL);
 	for(set<BWTA::BaseLocation*>::const_iterator b = pesat.begin(); b != pesat.end(); b++){
-		bool nexusfound = 0;
-		UnitGroup basshunter = AllUnits();
-		UnitGroup nex = basshunter.inRegion((*b)->getRegion());
-		if (!nex.empty()) {
-			for(set<BWAPI::Unit*>::const_iterator d = nex.begin(); d != nex.end(); d++) {		
-				if ((*d)->getType() == BWAPI::UnitTypes::Protoss_Nexus) {
-					nexusfound = 1;
-				}
-			}
-		}
-
-		if (this->baseManager->getBase((*b)) == NULL && nexusfound == 0) {
+		if (this->baseManager->getBase((*b)) == NULL) {
 			double temp_dist = (*b)->getGroundDistance(BWTA::getStartLocation(Broodwar->self()));
 			if((temp_dist) < distance.first) {
 				distance = pair<double, BWTA::BaseLocation*>(temp_dist, (*b));
