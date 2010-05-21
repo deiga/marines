@@ -108,7 +108,6 @@ void BasicAIModule::expander() {
   this->baseManager->expand(newbase);
   int frame_now = Broodwar->getFrameCount();
   marines_log << Broodwar->getFrameCount() << ": Looping frames" << endl;
-  while (frame_now <= frame_now+7) {}
   this->buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Photon_Cannon, 60, newbase->getTilePosition());
   this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Gateway, 80, newbase->getTilePosition());
 }
