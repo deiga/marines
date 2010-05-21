@@ -67,7 +67,8 @@ void BasicAIModule::onStart()
   this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Forge, 60);
   this->buildOrderManager->buildAdditional(45,UnitTypes::Protoss_Zealot,70);
   this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,60);
-  this->buildOrderManager->buildAdditional(2,UnitTypes::Protoss_Gateway,40);
+  this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,40);
+  this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,20);
 
   this->workerManager->enableAutoBuild();
   this->workerManager->setAutoBuildPriority(90);
@@ -103,7 +104,11 @@ void BasicAIModule::expander() {
   }
   //Broodwar->printf("Old: (%d, %d), New: (%d, %d)", Broodwar->self()->getStartLocation().x(), Broodwar->self()->getStartLocation().y(), newbase->getTilePosition().x(), newbase->getTilePosition().y());
   marines_log << Broodwar->getFrameCount() << ": Expand to (" << newbase->getTilePosition().x() << ", " << newbase->getTilePosition().y() << ")!" << endl;
-  this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Nexus, 100, newbase->getTilePosition());
+  //this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Nexus, 100, newbase->getTilePosition());
+  this->baseManager->expand(newbase);
+  int frame_now = Broodwar->getFrameCount();
+  marines_log << Broodwar->getFrameCount() << ": Looping frames" << endl;
+  while (frame_now <= frame_now+7) {}
   this->buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Photon_Cannon, 60, newbase->getTilePosition());
   this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Gateway, 80, newbase->getTilePosition());
 }
@@ -135,21 +140,23 @@ void BasicAIModule::onFrame()
 
     int zealot_count = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot);
     marines_log << Broodwar->getFrameCount() << ": Planning to Expand! " << endl;
-	if (zealot_count > 10 && Broodwar->self()->minerals() >= 200 && expcounter == 0) {
-		Broodwar->printf("Pylonia tekee");
-		BWTA::BaseLocation* newbase = &getNearestExpansion();
-		this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Pylon, 100, BWAPI::TilePosition(newbase->getTilePosition().x()-3, newbase->getTilePosition().y()-2));
-		this->borderManager->addMyBase(newbase);
-		expcounter++;
-	}
-    else if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
-		Broodwar->printf("Nyt puuhataan base");
+	  if (zealot_count > 10 && Broodwar->self()->minerals() >= 200 && expcounter == 0) {
+		  Broodwar->printf("Pylonia tekee");
+      marines_log << Broodwar->getFrameCount() << ": Pylonia tekee " << endl;
+		  BWTA::BaseLocation* newbase = &getNearestExpansion();
+		  this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Pylon, 100, BWAPI::TilePosition(newbase->getTilePosition().x()-3, newbase->getTilePosition().y()-2));
+		  this->borderManager->addMyBase(newbase);
+		  expcounter++;
+	  } else if (zealot_count > 10 && Broodwar->self()->minerals() >= 600) {
+      marines_log << Broodwar->getFrameCount() << ": Puuhataan base " << endl;
+		  Broodwar->printf("Nyt puuhataan base");
       expander();
-		expcounter = 0;
+		  expcounter = 0;
     }
   }
 
   if (Broodwar->getFrameCount() % 20 == 0) {
+    marines_log << Broodwar->getFrameCount() << ": Selecting all enemies " << endl;
     sightedEnemies = SelectAllEnemy();
   }
 
@@ -206,8 +213,11 @@ void BasicAIModule::onFrame()
     marines_log << Broodwar->getFrameCount() << ": Sending scout!" << endl;
     if (scoutManager->isScouting()) {
       if (this->scoutManager->scouts.begin()->second.mode == ScoutManager::ScoutData::Idle) {
+        this->scoutManager->setScoutCount(0);
         delete this->scoutManager;
         this->scoutManager = new ScoutManager(&this->arbitrator);
+        this->scoutManager->setDebugMode(true);
+        this->scoutManager->setScoutCount(1);
       }
     } else {
       this->scoutManager->setScoutCount(1);
@@ -325,7 +335,7 @@ void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
     if (sightedEnemies.size() == 1) {
       UnitGroup ownZealots = SelectAll(UnitTypes::Protoss_Zealot);
       for(UnitGroup::iterator it = ownZealots.begin(); it != ownZealots.end(); it++) {
-        (*it)->attackUnit(unit);
+        (*it)->attackMove(unit->getPosition());
       } 
     }
   }
@@ -412,4 +422,16 @@ void BasicAIModule::drawStats() {
     Broodwar->drawTextScreen(5,16*line,"- %d %ss",(*i).second, (*i).first.getName().c_str());
     line++;
   }
+}
+
+Unit* BasicAIModule::getClosestUnit(Unit* unit) {
+  pair<double, Unit*> minDist = make_pair(9999999.0, unit);
+
+  for(UnitGroup::const_iterator it = sightedEnemies.begin(); it != sightedEnemies.end(); it++) {
+    if ((*it)->getDistance(unit) < minDist.first) {
+      minDist = make_pair((*it)->getDistance(unit), (*it));
+    }
+  }
+  //Broodwar->printf("Player: %s", minDist.second->getPlayer()->getName().c_str());
+  return minDist.second;
 }

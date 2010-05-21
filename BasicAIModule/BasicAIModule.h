@@ -61,4 +61,5 @@ public:
   bool showManagerAssignments;
   int expcounter;
   UnitGroup sightedEnemies;
+  BWAPI::Unit* getClosestUnit(BWAPI::Unit*);
 };
