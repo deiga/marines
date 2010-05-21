@@ -155,7 +155,7 @@ void BasicAIModule::onFrame()
 
   if (Broodwar->getFrameCount() % 100 == 0) {
 
-	  if (Broodwar->getFrameCount() < 6000 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 15) {
+	  if (Broodwar->getFrameCount() < 6000 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) >= 15) {
       Broodwar->sendText("Attaaack! ...of the killer tomatoes!");
 		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
 			  if ((*i)->getType() == UnitTypes::Protoss_Zealot || (*i)->getType() == UnitTypes::Protoss_Dragoon) {
@@ -206,7 +206,8 @@ void BasicAIModule::onFrame()
     marines_log << Broodwar->getFrameCount() << ": Sending scout!" << endl;
     if (scoutManager->isScouting()) {
       if (this->scoutManager->scouts.begin()->second.mode == ScoutManager::ScoutData::Idle) {
-        this->scoutManager->setScoutCount(0);
+        delete this->scoutManager;
+        this->scoutManager = new ScoutManager(&this->arbitrator);
       }
     } else {
       this->scoutManager->setScoutCount(1);

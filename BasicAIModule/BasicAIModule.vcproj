@@ -176,10 +176,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Users\deiga\Desktop\battle.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Dll.cpp"
 				>
 			</File>
@@ -199,10 +195,6 @@
 			>
 			<File
 				RelativePath=".\BasicAIModule.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\..\Users\deiga\Desktop\battle.h"
 				>
 			</File>
 			<File
