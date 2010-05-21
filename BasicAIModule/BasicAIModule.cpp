@@ -428,7 +428,7 @@ Unit* BasicAIModule::getClosestUnit(Unit* unit) {
 void BasicAIModule::allUnitsAttackClosest() {
   UnitGroup own_units = SelectAll();
   for(UnitGroup::const_iterator it = own_units.begin(); it != own_units.end(); it++) {
-    if (!sightedEnemies.empty()) {
+    if (!sightedEnemies.empty() && !(*it)->getType().isWorker()) {
       Unit* target = getClosestUnit((*it));
       Unit* own = (*it);
       own->attackUnit(target);
