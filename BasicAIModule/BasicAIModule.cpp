@@ -149,9 +149,13 @@ void BasicAIModule::onFrame()
     }
   }
 
+  if (Broodwar->getFrameCount() % 20 == 0) {
+    sightedEnemies = SelectAllEnemy();
+  }
+
   if (Broodwar->getFrameCount() % 100 == 0) {
 
-	  if (Broodwar->getFrameCount() < 5000 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 15) {
+	  if (Broodwar->getFrameCount() < 6000 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 15) {
       Broodwar->sendText("Attaaack! ...of the killer tomatoes!");
 		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
 			  if ((*i)->getType() == UnitTypes::Protoss_Zealot || (*i)->getType() == UnitTypes::Protoss_Dragoon) {
@@ -163,7 +167,7 @@ void BasicAIModule::onFrame()
 		  }
 	  }
 	  else if ((Broodwar->self()->allUnitCount(UnitTypes::Protoss_Zealot) > 25 && Broodwar->self()->allUnitCount(UnitTypes::Protoss_Dragoon) > 10) || Broodwar->self()->supplyUsed() > 320) {
-      Broodwar->printf("Hep, supply: %d", Broodwar->self()->supplyUsed());
+      Broodwar->printf("Hep");
 		  std::set<Unit*> units=Broodwar->self()->getUnits();
 		  for (std::set<Unit*>::iterator i=units.begin();i!=units.end();i++) {
 			  if ((*i)->getType() == UnitTypes::Protoss_Zealot || (*i)->getType() == UnitTypes::Protoss_Dragoon) {
@@ -317,6 +321,12 @@ void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
   if (unit->getType().isBuilding() && unit->getPlayer()->isEnemy(Broodwar->self())) {
 	  enemyBuildings.insert(unit->getPosition());
 	  Broodwar->printf("Enemy building: X: %d, Y: %d", unit->getPosition().x(), unit->getPosition().y());
+    if (sightedEnemies.size() == 1) {
+      UnitGroup ownZealots = SelectAll(UnitTypes::Protoss_Zealot);
+      for(UnitGroup::iterator it = ownZealots.begin(); it != ownZealots.end(); it++) {
+        (*it)->attackUnit(unit);
+      } 
+    }
   }
 }
 void BasicAIModule::onUnitHide(BWAPI::Unit* unit)

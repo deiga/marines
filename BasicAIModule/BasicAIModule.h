@@ -60,4 +60,5 @@ public:
   EnhancedUI* enhancedUI;
   bool showManagerAssignments;
   int expcounter;
+  UnitGroup sightedEnemies;
 };
